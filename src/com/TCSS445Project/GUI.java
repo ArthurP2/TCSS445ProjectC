@@ -85,13 +85,14 @@ public class GUI {
     private final int BTN_HEIGHT = 30;
     private final int TEXTFIELD_WIDTH = 15;
 
+    private DB db;
 
     /**
      * Constructor for GUI class.
      */
     public GUI() {
 
-
+        db = new DB();
         inputPanel = new JPanel();
         buttonPanel = new JPanel();
         regisInputPanel = new JPanel();
@@ -264,18 +265,14 @@ public class GUI {
                 } catch (SQLException b) {
                     System.out.println(b);
                 }
-				/*
-				 * Calls getUser to search serialized Users, if it doesn't exist then
-				 * getUser returns null.
-				 */
+
+
                 if (!validLogin) {
                     noUserFoundLabel.setText("The username entered was not found!");
                     noUserFoundLabel.setVisible(true);
                     myFrame.repaint();
 
                 } else {
-
-
 
 					/*
 					 * If the user exists, but the password doesn't match then show
@@ -286,7 +283,24 @@ public class GUI {
                         noUserFoundLabel.setVisible(true);
                         myFrame.repaint();
                     } else {
-                        System.out.println("GOODJOB");
+                        db.start();
+                        //Gets user's info and places into User class object
+                        User user = db.getUserinfo(usernameField.getText());
+                        System.out.println("User info" + user.getUserID() +
+                         "," + user.getName() + "," + user.getUsername() + "," +
+                        "," + user.getPassword() + "," + user.getEmail() + "," +
+                        user.getPhoneNumber() + "," + user.getIsBanned() + "," + user.getType());
+
+                        db.close();
+                        if  (user.getIsBanned() == 1) {
+                            noUserFoundLabel.setText("YOU GOT BANNED!!HAHAHAH!!!!!!!!");
+                            noUserFoundLabel.setVisible(true);
+                        } else {
+                            SellerGUI sellerGUI = new SellerGUI(user, containerPanel, cLayout);
+                            clearTextFields();
+                            sellerGUI.start();
+                            System.out.println("GOODJOB");
+                        }
                     }
                 }
             }
@@ -468,7 +482,6 @@ public class GUI {
                             "', '" + regisUsernameField.getText() + "', '" + regisPasswordField.getText() +
                             "', '" + emailField.getText() + "', '" + phoneNumField.getText() +
                             "', '" + "0" + "', '" + type + "');";
-                    System.out.println(query);
                     int rowsUpdated = 0;
                     try {
                         stmt = conn.createStatement();
@@ -479,7 +492,6 @@ public class GUI {
                     if (rowsUpdated > 0) {
                         cLayout.show(containerPanel, INPUTPANEL);
                     } else {
-
                         userAlreadyExists.setVisible(true);
                     }
                 } else {
