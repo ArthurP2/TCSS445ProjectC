@@ -185,7 +185,7 @@ public class SellerGUI {
      * Once myMainScreen is made, adds it to the Main Container and Main CardLayout for use with the main JFrame.
      */
     public void start() {
-        myOptionButtons = new ButtonBuilder(new String[] {"Add Item", "View Storefront", "Logout"});
+        myOptionButtons = new ButtonBuilder(new String[] {"Add Item", "Remove Item", "View Storefront", "Logout"});
 
 
         SellerScreenController();
@@ -221,11 +221,12 @@ public class SellerGUI {
         myMainScreen.setLayout(new BorderLayout());
         myOptionButtons.buildButtons();
         myMainScreen.add(myOptionButtons, BorderLayout.SOUTH);
-        myOptionButtons.getButton(1).setEnabled(false);
+        myOptionButtons.getButton(2).setEnabled(false);
 //        myFrame.add(myMainScreen, BorderLayout.SOUTH);
         myOptionButtons.getButton(0).addActionListener(new AddItemForm());
-        myOptionButtons.getButton(1).addActionListener(new ViewStorefront());
-        myOptionButtons.getButton(2).addActionListener(new LogOut());
+        myOptionButtons.getButton(1).addActionListener(new RemoveItem());
+        myOptionButtons.getButton(2).addActionListener(new ViewStorefront());
+        myOptionButtons.getButton(3).addActionListener(new LogOut());
 
         SellerWelcomeScreen();
         SellerStorefrontRequestScreen();
@@ -257,6 +258,8 @@ public class SellerGUI {
         //System.out.println("result: " + myCal.getStorefront(myNPO.getUserName()));
         //System.out.println(myNPO.getUserName());
 //        if (myCal.getStorefront(myNPO.getUserName()) == null)
+        JTextArea info = new JTextArea("Here are the items of your store");
+        myWelcomeScreen.add(info, BorderLayout.NORTH);
          myWelcomeScreen.add(NO_ITEM_WELCOME, BorderLayout.CENTER);
          NPViewItemsScreen();
 //        else
@@ -357,7 +360,7 @@ public class SellerGUI {
                 if (j == 0) data[itemID-1][j] = i.getItemID();
                 if (j == 1) data[itemID-1][j] = i.getName();
                 if (j == 2) data[itemID-1][j] = i.getConditionType();
-                if (j == 3) data[itemID-1][j] = "$" + i.getPrice();
+                if (j == 3) data[itemID-1][j] = "$" + i.getPrice() + "0";
 				/*
                                 if (j == 4) {
 					if (myBidder.viewBids().containsKey(i)) {
@@ -443,9 +446,7 @@ public class SellerGUI {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            myMainScreen.remove(scrollPane);
-            NPViewItemsScreen();
-            myOptionButtons.getButton(1).setEnabled(false);
+            myOptionButtons.getButton(2).setEnabled(false);
             myLocalCLayout.show(myLocalContainer, SellerPANEL);
 
 
@@ -459,7 +460,7 @@ public class SellerGUI {
         @Override
         public void actionPerformed(ActionEvent e) {
             myLocalCLayout.show(myLocalContainer, NP_ITEM_ADD_FORM);
-            myOptionButtons.getButton(1).setEnabled(true);
+            myOptionButtons.getButton(2).setEnabled(true);
         }
 
     }
@@ -531,10 +532,13 @@ public class SellerGUI {
                 db.start();
                 boolean noProblem = db.addItem(item);
                 db.close();
-                if (noProblem)
-                JOptionPane.showMessageDialog(myMainScreen,
-                        "Your item has been successfully entered into our system.\nYou may continue entering items or click View Storefront to review your item list.",
-                        "Success!",JOptionPane.PLAIN_MESSAGE);
+                if (noProblem) {
+                    JOptionPane.showMessageDialog(myMainScreen,
+                            "Your item has been successfully entered into our system.\nYou may continue entering items or click View Storefront to review your item list.",
+                            "Success!", JOptionPane.PLAIN_MESSAGE);
+                    myWelcomeScreen.remove(scrollPane);
+                    NPViewItemsScreen();
+                }
                 else {
                     JOptionPane.showMessageDialog(myMainScreen,
                             "There seems to have been a problem.",
@@ -542,6 +546,43 @@ public class SellerGUI {
                 }
             }
 
+
+        }
+
+    }
+
+    class RemoveItem implements ActionListener
+    {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            int id;
+            id = Integer.parseInt(JOptionPane.showInputDialog("Please enter the ID number of the item you wish to delete. Integer numbers only."));
+            if (id < 0)
+                JOptionPane.showMessageDialog(myMainScreen,
+                        "Invalid entry. Can not be 0 or negative.",
+                        "Error!",
+                        JOptionPane.ERROR_MESSAGE);
+            else {
+                db.start();
+                boolean noProblem = db.removeItem(id);
+                db.close();
+                if (noProblem) {
+                    myWelcomeScreen.remove(scrollPane);
+                    myWelcomeScreen.revalidate();
+                    myWelcomeScreen.repaint();
+                    NPViewItemsScreen();
+                    JOptionPane.showMessageDialog(myMainScreen,
+                            "Item deleted!.",
+                            "Success!",
+                            JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(myMainScreen,
+                            "No such item exists.",
+                            "Error!",
+                            JOptionPane.ERROR_MESSAGE);
+                }
+            }
 
         }
 

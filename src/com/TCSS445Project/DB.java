@@ -123,5 +123,36 @@ public class DB {
         return list;
     }
 
+    public boolean removeItem(int itemID){
+        String query = "SELECT * FROM apanlili.item WHERE itemID='" + itemID + "';";
+        System.out.println("FINDITEM" + query);
+        boolean noProblem = false;
+        try {
+            Statement stmt = null;
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+                if ((rs.getInt(1) > 0)) {
+                    noProblem = true;
+                }
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+        if (noProblem){
+            query = "DELETE FROM apanlili.item WHERE itemID='" + itemID + "';";
+            System.out.println("DESTORYITEM" + query);
+            try {
+                Statement stmt = null;
+                stmt = conn.createStatement();
+                stmt.executeUpdate(query);
+                noProblem = true;
+            }catch (Exception e) {
+                noProblem = false;
+                System.out.println(e);
+            }
+        }
+        return noProblem;
+    }
+
 
 }
