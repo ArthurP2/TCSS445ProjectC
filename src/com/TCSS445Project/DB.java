@@ -113,10 +113,8 @@ public class DB {
                     item.setSize(rs.getString(8));
                     item.setComment(rs.getString(9));
                     list.add(item);
-                    System.out.println("YAH" + item.getName());
                 }
             } catch (Exception e) {
-                System.out.println("FS" + e);
             }
         } catch (Exception A) {
 

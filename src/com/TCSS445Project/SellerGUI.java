@@ -190,37 +190,11 @@ public class SellerGUI {
 
         SellerScreenController();
 
-        myLocalContainer.add(myViewStorefrontScreen, NP_Storefront_VIEW_SCREEN);
         myMainContainer.add(myMainScreen, SellerCARD);
         myMainCLayout.show(myMainContainer, SellerCARD);
 
     }
 
-    private void initializeHasStorefrontMessage()
-    {
-        //ArrayList<Storefront> StorefrontList;
-        //StorefrontList = (ArrayList<Storefront>) myCal.getStorefronts();
-        String StorefrontDate;
-        //Storefront currStorefront = myCal.getStorefront(myNPO.getUserName());
-//        Storefront currStorefront = myCal.getStorefront(myNPO.getUserName());
-//        System.out.println("result: " + myCal.getStorefront(myNPO.getUserName()));
-//        if (currStorefront == null)
-//        {
-//            StorefrontDate = null;
-//        }
-//        else
-//        {
-//            StorefrontDate = currStorefront.getDate().toString();
-//            myOptionButtons.getButton(0).setEnabled(false);
-//            myOptionButtons.getButton(1).setEnabled(true);
-//        }
-
-
-
-        HAS_Storefront_WELCOME = new JTextArea("Welcome, " + user.getName() + "\n");
-
-        HAS_Storefront_WELCOME.setEditable(false);
-    }
 
 
     /**
@@ -255,7 +229,7 @@ public class SellerGUI {
 
         SellerWelcomeScreen();
         SellerStorefrontRequestScreen();
-        initializeStorefrontRequestForm();
+
 
         initializeAddItemForm();
 
@@ -292,24 +266,7 @@ public class SellerGUI {
 //        }
     }
 
-    private void initializeViewStorefront()
-    {
-        myViewStorefrontScreen.setLayout(new BorderLayout());
 
-        JTextArea info = new JTextArea("Here is the details of your upcoming Storefront, .\n"
-                + "You may review and make changes here.");
-        info.setEditable(false);
-        myViewStorefrontScreen.add(info, BorderLayout.NORTH);
-        ButtonBuilder viewStorefrontButtons = new ButtonBuilder(new String[] {"Cancel Storefront", "Add Item", "Remove Item"});
-        viewStorefrontButtons.buildButtons();
-        myViewStorefrontScreen.add(viewStorefrontButtons, BorderLayout.SOUTH);
-
-
-
-        //viewStorefrontButtons.getButton(0).addActionListener(new RemoveStorefront());
-        viewStorefrontButtons.getButton(1).addActionListener(new AddItemForm());
-        //viewStorefrontButtons.getButton(2).addActionListener(new RemoveItem());
-    }
 
     private void initializeAddItemForm()
     {
@@ -423,7 +380,8 @@ public class SellerGUI {
         scrollPane = new JScrollPane(myItemTable);
         //myViewItemsScreen.setLayout(new BorderLayout());
         myWelcomeScreen.add(scrollPane, BorderLayout.CENTER);
-
+        myItemTable.repaint();
+        scrollPane.repaint();
         return (myItems.size() > 0);
     }
 
@@ -462,151 +420,12 @@ public class SellerGUI {
 
 
 
-
-
-
-
     }
 
 
 
-    /*
-    private int findStorefrontOnDay(int theDay)
-    {
-        int count = 0;
-        StorefrontDate currDay = new StorefrontDate();
-
-    }
-    */
-
-    private void initializeStorefrontRequestForm()
-    {
-        myRequestFormScreen.setLayout(new GridBagLayout());
-        GridBagConstraints c = new GridBagConstraints();
-        JButton submitButton = new JButton("Submit Request");
-
-        c.gridwidth = 1;
-        c.gridx = 0;
-        c.gridy = 0;
-        myRequestFormScreen.add(new JLabel("Storefront name: "), c);
-        c.gridx = 0;
-        c.gridy = 1;
-        myRequestFormScreen.add(new JLabel("Contact person: "), c);
-        c.gridx = 0;
-        c.gridy = 2;
-        myRequestFormScreen.add(new JLabel("Storefront description: "), c);
-        c.gridx = 0;
-        c.gridy = 3;
-        myRequestFormScreen.add(new JLabel("Comments: "), c);
-        c.gridx = 0;
-        c.gridy = 4;
-        myRequestFormScreen.add(new JLabel("Estimated item count: "), c);
-        c.gridx = 0;
-        c.gridy = 5;
-        myRequestFormScreen.add(new JLabel("Storefront start time: "), c);
-
-        c.ipadx = 200;
-        c.gridx = 1;
-        c.gridy = 0;
-        myRequestFormScreen.add(myStorefrontName, c);
-        c.gridx = 1;
-        c.gridy = 1;
-        myRequestFormScreen.add(myContactPerson, c);
-        c.gridx = 1;
-        c.gridy = 2;
-        myRequestFormScreen.add(myDescription, c);
-        c.gridx = 1;
-        c.gridy = 3;
-        myRequestFormScreen.add(myComments, c);
-        c.gridx = 1;
-        c.gridy = 4;
-        c.ipadx = 50;
-        myRequestFormScreen.add(myItemCount, c);
-        c.gridx = 1;
-        c.gridy = 5;
-        c.ipadx = 0;
-        myRequestFormScreen.add(myStartHour, c);
-
-        c.gridx = 1;
-        c.gridy = 6;
-        c.ipady = 50;
-        myRequestFormScreen.add(new JPanel(), c);
-        c.gridx = 1;
-        c.gridy = 7;
-        c.ipady = 0;
-        myRequestFormScreen.add(submitButton, c);
-
-        submitButton.addActionListener(new Submit());
-
-        //JPanel textTags = new JPanel();
-        //JPanel formBoxes = new JPanel();
-        //formBoxes.setLayout(new BoxLayout(formBoxes, BoxLayout.Y_AXIS));
-        //textTags.setLayout(new BoxLayout(textTags, BoxLayout.Y_AXIS));
-
-        //myRequestFormScreen.add(textTags, BorderLayout.WEST);
-        //myRequestFormScreen.add(formBoxes, BorderLayout.EAST);
-        /*
-        formBoxes.add(myStorefrontName);
-        formBoxes.add(myContactPerson);
-        formBoxes.add(myDescription);
-        formBoxes.add(myComments);
-        formBoxes.add(myItemCount);
-        formBoxes.add(myStartHour);
-
-        textTags.add(new JLabel("Storefront name: "));
-        textTags.add(new JLabel("Contact person: "));
-        textTags.add(new JLabel("Storefront description: "));
-        textTags.add(new JLabel("Comments: "));
-        textTags.add(new JLabel("Estimated item count: "));
-        textTags.add(new JLabel("Storefront start time: "));
-        */
-    }
-
-    private int findMonthEnd(int[] dates)
-    {
-        if (dates[0] == 1)
-            return 99;
-        for (int i = 1; i < dates.length; i++)
-        {
-            if (dates[i] < dates[i-1])
-            {
-                //System.out.println("Found: " + i);
-                return i;
-            }
-        }
-        return 99;
-    }
-
-//    private void setUpConfirmation()
-//    {
-//        Storefront theStorefront = myNPO.getStorefront();
-//        CONFIRMATION_MESSAGE = new JTextArea("You have successfully submitted an Storefront request!\n"
-//                + "\nYour Storefront details are:\n"
-//                + "     -Name: " + theStorefront.getStorefrontName() + "\n"
-//                + "     -Date: " + theStorefront.getDate().toString() + "\n"
-//                + "     -Contact: " + theStorefront.getContactPerson() + "\n"
-//                + "     -Description: " + theStorefront.getDescription() + "\n\n"
-//                + "Thank you for choosing Storefront Central.");
-//        CONFIRMATION_MESSAGE.setEditable(false);
-//        myConfirmation.setLayout(new BorderLayout());
-//        JButton button = new JButton("OK");
-//        //myConfirmation.add(button, BorderLayout.SOUTH);
-//        myConfirmation.add(CONFIRMATION_MESSAGE, BorderLayout.CENTER);
-//        // button.addActionListener(new ReturnToNPMainMenu());
-//    }
 
 
-    class RequestStorefront implements ActionListener
-    {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            myLocalCLayout.show(myLocalContainer, SellerREQUESTPANEL); //Switches to Storefront Request panel via static String name
-            myOptionButtons.getButton(0).setEnabled(false);
-
-        }
-
-    }
 
     class LogOut implements ActionListener {
         @Override
@@ -617,115 +436,18 @@ public class SellerGUI {
         }
     }
 
-    class Submit implements ActionListener
-    {
 
-        /*
-        private JTextField myStorefrontName;
-    private JTextField myContactPerson;
-    private JTextField myItemCount;
-    private JTextField myDescription;
-    private JTextField myComments;
-        */
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            String StorefrontName = "";
-            String contact = "";
-            String itemCount = "";
-            String desc = "";
-            String comments = "";
-
-            boolean problem = false;
-            if (myStartHour.getSelectedIndex() == 0 || myStartHour.getSelectedIndex() == 1)
-            {
-                JOptionPane.showMessageDialog(myMainScreen,
-                        "Please select a start time to submit.",
-                        "Time issue",
-                        JOptionPane.ERROR_MESSAGE);
-                problem = true;
-            }
-            else
-            {
-//                theDate = new StorefrontDate(myDate[0], myDate[1], myDate[2], myStartHour.getSelectedIndex()-2);
-//                System.out.println(theDate.toString());
-            }
-            if (myStorefrontName.getText().matches(""))
-            {
-                JOptionPane.showMessageDialog(myMainScreen,
-                        "Please enter a name for this Storefront.",
-                        "Name issue",
-                        JOptionPane.ERROR_MESSAGE);
-                problem = true;
-            }
-            else
-            {
-                StorefrontName = myStorefrontName.getText();
-            }
-            if (myContactPerson.getText().matches(""))
-            {
-                JOptionPane.showMessageDialog(myMainScreen,
-                        "Please enter who will be the contact person for this Storefront.",
-                        "Missing contact",
-                        JOptionPane.ERROR_MESSAGE);
-                problem = true;
-            }
-            else
-            {
-                contact = myContactPerson.getText();
-            }
-            if (myItemCount.getText().matches(""))
-            {
-                JOptionPane.showMessageDialog(myMainScreen,
-                        "Please enter an estimate for the number of items expected.",
-                        "Item count issue",
-                        JOptionPane.ERROR_MESSAGE);
-                problem = true;
-            }
-            else
-            {
-                itemCount = myItemCount.getText();
-            }
-            if (myDescription.getText().matches(""))
-            {
-                JOptionPane.showMessageDialog(myMainScreen,
-                        "You are missing a description of this Storefront.",
-                        "Missing description",
-                        JOptionPane.WARNING_MESSAGE);
-                problem = true;
-            }
-            else
-            {
-                desc = myDescription.getText();
-            }
-
-
-
-        }
-
-
-
-    }
-    /*
-    class ReturnToNPMainMenu implements ActionListener
-    {
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            SellerWelcomeScreen();
-            myLocalCLayout.show(myLocalContainer, SellerPANEL);
-        }
-
-    }
-    */
 
     class ViewStorefront implements ActionListener
     {
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+            myMainScreen.remove(scrollPane);
+            NPViewItemsScreen();
+            myOptionButtons.getButton(1).setEnabled(false);
             myLocalCLayout.show(myLocalContainer, SellerPANEL);
+
 
         }
 
