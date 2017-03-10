@@ -4,6 +4,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -69,6 +71,58 @@ public class DB {
             System.out.println(e);
         }
         return user;
+    }
+
+    public boolean addItem(Item item){
+        String query = "INSERT INTO apanlili.item (sellerID, name, description, quantity, price, " +
+                "conditionType, size, comment) VALUES ('" + item.getSellerID() + "', '" + item.getName() + "', '" + item.getDescription() + "'" +
+                ", '" + item.getQuantity() + "', '" + item.getPrice() + "', '" + item.getConditionType() + "'" +
+                ", '" + item.getSize() + "', '" + item.getComment() + "');";
+        System.out.println(query);
+        boolean noProblem = false;
+        try {
+            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
+            stmt.executeUpdate(query);
+            noProblem = true;
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+        return noProblem;
+    }
+
+    public ArrayList<Item> getMyStoreItems(int sellerID){
+        String query = "SELECT * FROM apanlili.item WHERE " +
+                "sellerID='" + sellerID + "';";
+        System.out.println(query);
+        ArrayList<Item> list = new ArrayList<>();
+        try {
+            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            try {
+                while (rs.next()) {
+                    Item item = new Item();
+                    item.setItemID(rs.getInt(1));
+                    item.setSellerID(rs.getInt(2));
+                    item.setName(rs.getString(3));
+                    item.setDescription(rs.getString(4));
+                    item.setQuantity(rs.getInt(5));
+                    item.setPrice(rs.getDouble(6));
+                    item.setConditionType(rs.getString(7));
+                    item.setSize(rs.getString(8));
+                    item.setComment(rs.getString(9));
+                    list.add(item);
+                    System.out.println("YAH" + item.getName());
+                }
+            } catch (Exception e) {
+                System.out.println("FS" + e);
+            }
+        } catch (Exception A) {
+
+        }
+        System.out.println("SIZE"+ list.size());
+        return list;
     }
 
 

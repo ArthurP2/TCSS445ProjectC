@@ -296,10 +296,13 @@ public class GUI {
                             noUserFoundLabel.setText("YOU GOT BANNED!!HAHAHAH!!!!!!!!");
                             noUserFoundLabel.setVisible(true);
                         } else {
-                            SellerGUI sellerGUI = new SellerGUI(user, containerPanel, cLayout);
-                            clearTextFields();
-                            sellerGUI.start();
-                            System.out.println("GOODJOB");
+                            if (user.getType()== 2) {
+                                SellerGUI sellerGUI = new SellerGUI(user, containerPanel, cLayout);
+                                clearTextFields();
+                                sellerGUI.start();
+                            }
+
+                            System.out.println("SignedIn");
                         }
                     }
                 }

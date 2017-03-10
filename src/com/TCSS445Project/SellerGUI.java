@@ -1,12 +1,9 @@
 package com.TCSS445Project;
 
 //import static BidderGUI.COLUMNNUMBERS;
-import com.TCSS445Project.ButtonBuilder;
-import com.TCSS445Project.User;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
-import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
@@ -16,14 +13,9 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 
-import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -32,7 +24,6 @@ import javax.swing.JSpinner;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
 /**
@@ -59,6 +50,7 @@ public class SellerGUI {
     private static final String NP_ITEM_ADD_FORM = "NP Item Add Form";
 
     private User user;
+    private DB db;
 
     final static int IDWIDTH = 20;
     final static int NAMEWIDTH = 100;
@@ -70,7 +62,7 @@ public class SellerGUI {
     final static String[] COLUMNNAMES = {"ID #",
             "Item Name",
             "Condition",
-            "Min. Bid",
+            "Price",
     };
 
     /*
@@ -98,7 +90,7 @@ public class SellerGUI {
     private JPanel myAddItemForm;
     private JScrollPane scrollPane;
 
-    private JTextArea NO_Storefront_WELCOME;
+    private JTextArea NO_ITEM_WELCOME;
     private JTextArea HAS_Storefront_WELCOME;
     private static final JTextArea Storefront_REQUEST_HELP = new JTextArea("These are the next 30 days starting from today."
             + "\nDays that are available will have a clickable button."
@@ -124,10 +116,9 @@ public class SellerGUI {
     */
 
     private JTextField myItemName;
-    private JTextField myItemDonor;
     private JTextField myItemDesc;
     private JSpinner myItemQty;
-    private JSpinner myItemStartBid;
+    private JSpinner myItemPrice;
     private JComboBox myItemCnd;
     private JComboBox myItemSize;
     private JTextField myItemComments;
@@ -145,6 +136,7 @@ public class SellerGUI {
      */
     public SellerGUI(User theUser, JPanel theContainer, CardLayout theCLayout) {
         user = theUser;
+        db = new DB();
         myMainContainer = theContainer;
         myMainCLayout = theCLayout;
         myDate = new int[3];
@@ -162,20 +154,19 @@ public class SellerGUI {
         myViewStorefrontScreen = new JPanel();
         myAddItemForm = new JPanel();
 
-        NO_Storefront_WELCOME = new JTextArea("Welcome, " + user.getName() + "\n"
-                + "\nYou currently have no upcoming Storefront in our system.\n"
-                + "Please click \"Request Storefront\" if you would like to request an Storefront.");
+        NO_ITEM_WELCOME = new JTextArea("Welcome, " + user.getName() + "\n"
+                + "\nYou currently have no items in your storefront.\n"
+                + "Please click \"Add item\" if you would like to add an item.");
 
         myItemName = new JTextField();
-        myItemDonor = new JTextField();
         myItemDesc = new JTextField();
         myItemQty = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
-        myItemStartBid = new JSpinner(new SpinnerNumberModel(0, 0, 9999.99, 1));
+        myItemPrice = new JSpinner(new SpinnerNumberModel(0, 0, 9999.99, 1));
         myItemCnd = new JComboBox(new String[] {"Select Condition", "-----------", "New", "Like new", "Good", "Fair", "Poor", "Bad"});
         myItemSize = new JComboBox(new String[] {"Select Size", "------------", "Tiny", "Small", "Medium", "Large", "Huge"});
         myItemComments = new JTextField();
 
-        NO_Storefront_WELCOME.setEditable(false);
+        NO_ITEM_WELCOME.setEditable(false);
 
         myStorefrontName = new JTextField();
         myContactPerson = new JTextField();
@@ -194,11 +185,12 @@ public class SellerGUI {
      * Once myMainScreen is made, adds it to the Main Container and Main CardLayout for use with the main JFrame.
      */
     public void start() {
-        myOptionButtons = new ButtonBuilder(new String[] {"Request Storefront", "View Storefront", "Logout"});
+        myOptionButtons = new ButtonBuilder(new String[] {"Add Item", "View Storefront", "Logout"});
 
 
         SellerScreenController();
 
+        myLocalContainer.add(myViewStorefrontScreen, NP_Storefront_VIEW_SCREEN);
         myMainContainer.add(myMainScreen, SellerCARD);
         myMainCLayout.show(myMainContainer, SellerCARD);
 
@@ -225,10 +217,7 @@ public class SellerGUI {
 
 
 
-        HAS_Storefront_WELCOME = new JTextArea("Welcome, " + user.getName() + "\n"
-                + "\nYour Storefront is scheduled to be held on " + "NEVER" + ".\n"
-                + "Click \"View Storefront\" if you wish to review or update any\n"
-                + "information or item listings.");
+        HAS_Storefront_WELCOME = new JTextArea("Welcome, " + user.getName() + "\n");
 
         HAS_Storefront_WELCOME.setEditable(false);
     }
@@ -260,7 +249,7 @@ public class SellerGUI {
         myMainScreen.add(myOptionButtons, BorderLayout.SOUTH);
         myOptionButtons.getButton(1).setEnabled(false);
 //        myFrame.add(myMainScreen, BorderLayout.SOUTH);
-        myOptionButtons.getButton(0).addActionListener(new RequestStorefront());
+        myOptionButtons.getButton(0).addActionListener(new AddItemForm());
         myOptionButtons.getButton(1).addActionListener(new ViewStorefront());
         myOptionButtons.getButton(2).addActionListener(new LogOut());
 
@@ -294,7 +283,8 @@ public class SellerGUI {
         //System.out.println("result: " + myCal.getStorefront(myNPO.getUserName()));
         //System.out.println(myNPO.getUserName());
 //        if (myCal.getStorefront(myNPO.getUserName()) == null)
-//            myWelcomeScreen.add(NO_Storefront_WELCOME, BorderLayout.CENTER);
+         myWelcomeScreen.add(NO_ITEM_WELCOME, BorderLayout.CENTER);
+         NPViewItemsScreen();
 //        else
 //        {
 //            initializeHasStorefrontMessage();
@@ -310,7 +300,7 @@ public class SellerGUI {
                 + "You may review and make changes here.");
         info.setEditable(false);
         myViewStorefrontScreen.add(info, BorderLayout.NORTH);
-        //ButtonBuilder viewStorefrontButtons = new ButtonBuilder(new String[] {"Cancel Storefront", "Add Item", "Remove Item"});
+        ButtonBuilder viewStorefrontButtons = new ButtonBuilder(new String[] {"Cancel Storefront", "Add Item", "Remove Item"});
         viewStorefrontButtons.buildButtons();
         myViewStorefrontScreen.add(viewStorefrontButtons, BorderLayout.SOUTH);
 
@@ -327,7 +317,7 @@ public class SellerGUI {
         JPanel form = new JPanel();
         form.setLayout(new GridBagLayout());
         myAddItemForm.add(form, BorderLayout.CENTER);
-        JLabel info = new JLabel("This is the item submission form. Fields marked with a * are required.");
+        JLabel info = new JLabel("This is the item submission form.");
         myAddItemForm.add(info, BorderLayout.NORTH);
         GridBagConstraints c = new GridBagConstraints();
         JButton submitButton = new JButton("Submit Item");
@@ -335,37 +325,32 @@ public class SellerGUI {
 
         c.gridwidth = 1;
         c.gridx = 0;
-        c.gridy = 0;
-        form.add(new JLabel("Item name: *"), c);
-        c.gridx = 0;
         c.gridy = 1;
-        form.add(new JLabel("Donor: "), c);
+        form.add(new JLabel("Item name: "), c);
         c.gridx = 0;
         c.gridy = 2;
-        form.add(new JLabel("Description: *"), c);
+        form.add(new JLabel("Description: "), c);
         c.gridx = 0;
         c.gridy = 3;
         form.add(new JLabel("Quantity: "), c);
         c.gridx = 0;
         c.gridy = 4;
-        form.add(new JLabel("Starting bid: *"), c);
+        form.add(new JLabel("Price ($): "), c);
         c.gridx = 0;
         c.gridy = 5;
-        form.add(new JLabel("Condition: *"), c);
+        form.add(new JLabel("Condition: "), c);
         c.gridx = 0;
         c.gridy = 6;
-        form.add(new JLabel("Size: *"), c);
+        form.add(new JLabel("Size: "), c);
         c.gridx = 0;
         c.gridy = 7;
         form.add(new JLabel("Comments: "), c);
 
         c.ipadx = 200;
         c.gridx = 1;
-        c.gridy = 0;
-        form.add(myItemName, c);
-        c.gridx = 1;
         c.gridy = 1;
-        form.add(myItemDonor, c);
+        form.add(myItemName, c);
+
         c.gridx = 1;
         c.gridy = 2;
         form.add(myItemDesc, c);
@@ -376,7 +361,7 @@ public class SellerGUI {
         c.gridx = 1;
         c.gridy = 4;
         //c.ipadx = 100;
-        form.add(myItemStartBid, c);
+        form.add(myItemPrice, c);
         c.gridx = 1;
         c.gridy = 5;
         c.ipadx = 0;
@@ -400,44 +385,47 @@ public class SellerGUI {
         form.add(submitButton, c);
     }
 
-//    private boolean NPViewItemsScreen(Storefront theStorefront/*, ButtonBuilder theButtons*/) {
-//        List<Item> myItems = theStorefront.getItems();
-//
-//        Object[][] data = new Object[myItems.size()][COLUMNNUMBERS];
-//        int itemID = 1;
-//        //for (int k = 0; k < COLUMNNUMBERS; k++) {
-//        //	data[0][k] = COLUMNNAMES[k];
-//        //}
-//        for (Item i : myItems) {
-//            for (int j = 0; j < COLUMNNUMBERS; j++) {
-//                if (j == 0) data[itemID-1][j] = itemID;
-//                if (j == 1) data[itemID-1][j] = i.getName();
-//                if (j == 2) data[itemID-1][j] = i.getCondition();
-//                if (j == 3) data[itemID-1][j] = "$" + i.getStartingBid();
-//				/*
-//                                if (j == 4) {
-//					if (myBidder.viewBids().containsKey(i)) {
-//						data[itemID][j] = myBidder.viewBids().get(i);
-//					} else {
-//						data[itemID][j] = null;
-//					}
-//				}
-//                                */
-//            }
-//            itemID++;
-//        }
-//        //if (myItems.size() == 0)
-//        //theButtons.getButton(2).setEnabled(false);
-//        myItemTable = new JTable(data, COLUMNNAMES);
-////		myViewItemsScreen.setLayout(new BorderLayout());
-////		myViewItemsScreen.add(myItemTable, BorderLayout.CENTER);
-//
-//        scrollPane = new JScrollPane(myItemTable);
-//        //myViewItemsScreen.setLayout(new BorderLayout());
-//        myViewStorefrontScreen.add(scrollPane, BorderLayout.CENTER);
-//
-//        return (myItems.size() > 0);
-//    }
+    private boolean NPViewItemsScreen() {
+        db.start();
+        ArrayList<Item> myItems = db.getMyStoreItems(user.getUserID());
+        db.close();
+        System.out.println(myItems.size());
+        Object[][] data = new Object[myItems.size()][COLUMNNUMBERS];
+        int itemID = 1;
+        //for (int k = 0; k < COLUMNNUMBERS; k++) {
+        //	data[0][k] = COLUMNNAMES[k];
+        //}
+        for (Item i : myItems) {
+            for (int j = 0; j < COLUMNNUMBERS; j++) {
+                if (j == 0) data[itemID-1][j] = i.getItemID();
+                if (j == 1) data[itemID-1][j] = i.getName();
+                if (j == 2) data[itemID-1][j] = i.getConditionType();
+                if (j == 3) data[itemID-1][j] = "$" + i.getPrice();
+				/*
+                                if (j == 4) {
+					if (myBidder.viewBids().containsKey(i)) {
+						data[itemID][j] = myBidder.viewBids().get(i);
+					} else {
+						data[itemID][j] = null;
+					}
+				}
+                                */
+            }
+            itemID++;
+        }
+        //if (myItems.size() == 0)
+        //theButtons.getButton(2).setEnabled(false);
+
+        myItemTable = new JTable(data, COLUMNNAMES);
+//		myViewItemsScreen.setLayout(new BorderLayout());
+//		myViewItemsScreen.add(myItemTable, BorderLayout.CENTER);
+
+        scrollPane = new JScrollPane(myItemTable);
+        //myViewItemsScreen.setLayout(new BorderLayout());
+        myWelcomeScreen.add(scrollPane, BorderLayout.CENTER);
+
+        return (myItems.size() > 0);
+    }
 
     /**
      * This method creates the Storefront Request JPanel.
@@ -737,7 +725,8 @@ public class SellerGUI {
         @Override
         public void actionPerformed(ActionEvent e) {
             //throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-            myLocalCLayout.show(myLocalContainer, NP_Storefront_VIEW_SCREEN);
+            myLocalCLayout.show(myLocalContainer, SellerPANEL);
+
         }
 
     }
@@ -748,7 +737,7 @@ public class SellerGUI {
         @Override
         public void actionPerformed(ActionEvent e) {
             myLocalCLayout.show(myLocalContainer, NP_ITEM_ADD_FORM);
-            viewStorefrontButtons.getButton(2).setEnabled(true);
+            myOptionButtons.getButton(1).setEnabled(true);
         }
 
     }
@@ -776,11 +765,11 @@ public class SellerGUI {
                 problem = true;
             }
             try {
-                myItemStartBid.commitEdit();
+                myItemPrice.commitEdit();
             } catch (ParseException ex) {
                 //Logger.getLogger(SellerGUI.class.getName()).log(Level.SEVERE, null, ex);
             }
-            if ((double) myItemStartBid.getValue() <= 0)
+            if ((double) myItemPrice.getValue() <= 0)
             {
                 JOptionPane.showMessageDialog(myMainScreen,
                         "Please enter a starting bid for this item.",
@@ -788,7 +777,7 @@ public class SellerGUI {
                         JOptionPane.ERROR_MESSAGE);
                 problem = true;
             }
-            //System.out.println((double) myItemStartBid.getValue());
+            //System.out.println((double) myItemPrice.getValue());
             if (myItemCnd.getSelectedIndex() == 0 || myItemCnd.getSelectedIndex() == 1)
             {
                 JOptionPane.showMessageDialog(myMainScreen,
@@ -804,6 +793,31 @@ public class SellerGUI {
                         "Size issue",
                         JOptionPane.ERROR_MESSAGE);
                 problem = true;
+            }
+
+            if (!problem) {
+                String itemName = myItemName.getText();
+                String itemDesc = myItemDesc.getText();
+                int itemQty = (int) myItemQty.getValue();
+                double itemPrice = (double) myItemPrice.getValue();
+                String itemCnd = (String) myItemCnd.getSelectedItem();
+                String itemSize = (String) myItemSize.getSelectedItem();
+                String itemComment = myItemComments.getText();
+
+                Item item = new Item(0, user.getUserID(), itemName, itemDesc,
+                        itemQty, itemPrice, itemCnd, itemSize, itemComment);
+                db.start();
+                boolean noProblem = db.addItem(item);
+                db.close();
+                if (noProblem)
+                JOptionPane.showMessageDialog(myMainScreen,
+                        "Your item has been successfully entered into our system.\nYou may continue entering items or click View Storefront to review your item list.",
+                        "Success!",JOptionPane.PLAIN_MESSAGE);
+                else {
+                    JOptionPane.showMessageDialog(myMainScreen,
+                            "There seems to have been a problem.",
+                            "Failure!",JOptionPane.PLAIN_MESSAGE);
+                }
             }
 
 
