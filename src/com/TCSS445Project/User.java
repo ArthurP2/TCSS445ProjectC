@@ -6,9 +6,6 @@ package com.TCSS445Project;
 public class User {
 
     int userID;
-
-
-
     String name;
     String username;
     String password;

@@ -7,12 +7,7 @@ public class Item {
 
     int itemID;
     int sellerID;
-
-
     String name;
-
-
-
     String description;
     double price;
     int quantity;

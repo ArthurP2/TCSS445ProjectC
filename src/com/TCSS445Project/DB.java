@@ -91,9 +91,60 @@ public class DB {
         return noProblem;
     }
 
+    public boolean addToCart(int userID, int itemID){
+        String query = "INSERT INTO apanlili.shoppingCart (buyerID, itemID)" +
+                " VALUES (" + userID + ", " + itemID + ");";
+        System.out.println(query);
+        boolean success = false;
+        try {
+            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
+            stmt.executeUpdate(query);
+            success = true;
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+        return success;
+    }
+
     public ArrayList<Item> getMyStoreItems(int sellerID){
         String query = "SELECT * FROM apanlili.item WHERE " +
                 "sellerID='" + sellerID + "';";
+        System.out.println(query);
+        ArrayList<Item> list = new ArrayList<>();
+        try {
+            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            try {
+                while (rs.next()) {
+                    Item item = new Item();
+                    item.setItemID(rs.getInt(1));
+                    item.setSellerID(rs.getInt(2));
+                    item.setName(rs.getString(3));
+                    item.setDescription(rs.getString(4));
+                    item.setQuantity(rs.getInt(5));
+                    item.setPrice(rs.getDouble(6));
+                    item.setConditionType(rs.getString(7));
+                    item.setSize(rs.getString(8));
+                    item.setComment(rs.getString(9));
+                    list.add(item);
+                }
+            } catch (Exception e) {
+            }
+        } catch (Exception A) {
+
+        }
+        System.out.println("SIZE"+ list.size());
+        return list;
+    }
+
+    public ArrayList<Item> getMyCartItems(int buyerID){
+        String query = "SELECT i.itemID, sellerID, `name`, `description`, price, `quantity`, conditionType, size, `comment` " +
+                        "FROM apanlili.item AS i " +
+                        "LEFT OUTER JOIN apanlili.shoppingCart AS sc " +
+                        "ON i.itemID=sc.itemID " +
+                        "WHERE buyerID=" + buyerID + ";";
         System.out.println(query);
         ArrayList<Item> list = new ArrayList<>();
         try {
@@ -140,6 +191,37 @@ public class DB {
         }
         if (noProblem){
             query = "DELETE FROM apanlili.item WHERE itemID='" + itemID + "';";
+            System.out.println("DESTORYITEM" + query);
+            try {
+                Statement stmt = null;
+                stmt = conn.createStatement();
+                stmt.executeUpdate(query);
+                noProblem = true;
+            }catch (Exception e) {
+                noProblem = false;
+                System.out.println(e);
+            }
+        }
+        return noProblem;
+    }
+
+    public boolean removeFromCart(int userID, int itemID){
+        String query = "SELECT * FROM apanlili.shoppingCart WHERE itemID=" + itemID + " AND buyerID=" + userID + ";";
+        System.out.println("FINDITEM" + query);
+        boolean noProblem = false;
+        try {
+            Statement stmt = null;
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+                if ((rs.getInt(1) > 0)) {
+                    noProblem = true;
+                }
+        }catch (Exception e) {
+            System.out.println(e);
+        }
+        if (noProblem){
+            query = "DELETE FROM apanlili.shoppingCart WHERE itemID=" + itemID + " AND buyerID=" + userID + ";";
             System.out.println("DESTORYITEM" + query);
             try {
                 Statement stmt = null;
