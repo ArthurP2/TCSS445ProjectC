@@ -139,6 +139,37 @@ public class DB {
         return list;
     }
 
+    public ArrayList<Item> getMyStoreItemsSort(int sellerID, String sort){
+        String query = "SELECT * FROM apanlili.item WHERE " +
+                "sellerID='" + sellerID + "' ORDER BY " + sort + ";";
+        System.out.println(query);
+        ArrayList<Item> list = new ArrayList<>();
+        try {
+            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            try {
+                while (rs.next()) {
+                    Item item = new Item();
+                    item.setItemID(rs.getInt(1));
+                    item.setSellerID(rs.getInt(2));
+                    item.setName(rs.getString(3));
+                    item.setDescription(rs.getString(4));
+                    item.setQuantity(rs.getInt(5));
+                    item.setPrice(rs.getDouble(6));
+                    item.setConditionType(rs.getString(7));
+                    item.setSize(rs.getString(8));
+                    item.setComment(rs.getString(9));
+                    list.add(item);
+                }
+            } catch (Exception e) {
+            }
+        } catch (Exception A) {
+
+        }
+        return list;
+    }
+
     public ArrayList<Item> getMyCartItems(int buyerID){
         String query = "SELECT i.itemID, sellerID, `name`, `description`, price, `quantity`, conditionType, size, `comment` " +
                         "FROM apanlili.item AS i " +
@@ -170,7 +201,6 @@ public class DB {
         } catch (Exception A) {
 
         }
-        System.out.println("SIZE"+ list.size());
         return list;
     }
 

@@ -115,7 +115,9 @@ public class SellerGUI {
     private JTextField myItemComments2;
 
     private ButtonBuilder myOptionButtons;
-
+    private JPanel myMainButtonsPane;
+    private JComboBox mySorter;
+    private String sortType;
 
 
     /**
@@ -127,10 +129,10 @@ public class SellerGUI {
     public SellerGUI(User theUser, JPanel theContainer, CardLayout theCLayout) {
         user = theUser;
         db = new DB();
+        sortType = "none";
         myMainContainer = theContainer;
         myMainCLayout = theCLayout;
-
-
+        myMainButtonsPane = new JPanel(new GridLayout(3,1));
         myLocalContainer = new JPanel();
         myLocalCLayout = new CardLayout();
         myMainScreen = new JPanel();
@@ -138,6 +140,7 @@ public class SellerGUI {
         myRequestScreen = new JPanel();
         myRequestCalendarScreen = new JPanel();
         myRequestFormScreen = new JPanel();
+        mySorter = new JComboBox(new String[] {"Sort by..", "Id", "Name", "Description", "Quantity", "Price", "Condition", "Size", "Comments"});
 
 
         myConfirmation = new JPanel();
@@ -214,7 +217,9 @@ public class SellerGUI {
     private void SellerScreenController() {
         myMainScreen.setLayout(new BorderLayout());
         myOptionButtons.buildButtons();
-        myMainScreen.add(myOptionButtons, BorderLayout.SOUTH);
+        //myMainScreen.add(myOptionButtons, BorderLayout.SOUTH);
+
+        mySorter.addActionListener(new sortItem());
         myOptionButtons.getButton(3).setEnabled(false);
         myOptionButtons.getButton(0).addActionListener(new AddItemForm());
         myOptionButtons.getButton(1).addActionListener(new RemoveItem());
@@ -222,14 +227,21 @@ public class SellerGUI {
         myOptionButtons.getButton(3).addActionListener(new ViewStorefront());
         myOptionButtons.getButton(4).addActionListener(new LogOut());
 
+
         SellerWelcomeScreen();
         SellerStorefrontRequestScreen();
 
 
         initializeAddItemForm();
         initializeEditItemForm();
+        myMainButtonsPane.add(myOptionButtons);
+        GridBagConstraints c = new GridBagConstraints();
+        c.gridwidth = 1;
+        c.gridx = 0;
+        c.gridy = 1;
+        myMainButtonsPane.add(mySorter, c);
 
-
+        myMainScreen.add(myMainButtonsPane, BorderLayout.SOUTH);
         myLocalContainer.setLayout(myLocalCLayout);
         myLocalContainer.add(myWelcomeScreen, SellerPANEL);
         myLocalContainer.add(myRequestScreen, SellerREQUESTPANEL);
@@ -256,7 +268,7 @@ public class SellerGUI {
                 30));
         myWelcomeScreen.add(info, BorderLayout.NORTH);
          myWelcomeScreen.add(NO_ITEM_WELCOME, BorderLayout.CENTER);
-         NPViewItemsScreen();
+         NPViewItemsScreen(sortType);
 
     }
 
@@ -421,9 +433,14 @@ public class SellerGUI {
         form.add(submitButton, c);
     }
 
-    private boolean NPViewItemsScreen() {
+    private boolean NPViewItemsScreen(String sortType) {
+        ArrayList<Item> myItems;
         db.start();
-        ArrayList<Item> myItems = db.getMyStoreItems(user.getUserID());
+        if (!sortType.equals("none")) {
+            myItems = db.getMyStoreItemsSort(user.getUserID(), sortType);
+        } else {
+            myItems = db.getMyStoreItems(user.getUserID());
+        }
         db.close();
         System.out.println(myItems.size());
         Object[][] data = new Object[myItems.size()][COLUMNNUMBERS];
@@ -500,6 +517,8 @@ public class SellerGUI {
 
 
 
+
+
     class ViewStorefront implements ActionListener
     {
 
@@ -541,6 +560,46 @@ public class SellerGUI {
                         "Failure!",JOptionPane.PLAIN_MESSAGE);
             }
 
+        }
+
+    }
+
+    class sortItem implements ActionListener
+    {
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println(mySorter.getSelectedIndex());
+            if (mySorter.getSelectedIndex() == 1) {
+                sortType = "itemID";
+            }
+            if (mySorter.getSelectedIndex() == 2) {
+                sortType = "name";
+            }
+            if (mySorter.getSelectedIndex() == 3) {
+                sortType= "description";
+            }
+            if (mySorter.getSelectedIndex() == 4) {
+                sortType = "quantity";
+            }
+            if (mySorter.getSelectedIndex() == 5) {
+                sortType = "price";
+            }
+            if (mySorter.getSelectedIndex() == 6) {
+                sortType = "conditionType";
+            }
+            if (mySorter.getSelectedIndex() == 7) {
+                sortType = "size";
+            }
+            if (mySorter.getSelectedIndex() == 8) {
+                sortType = "comment";
+            }
+            if (mySorter.getSelectedIndex() > 0) {
+                myWelcomeScreen.remove(scrollPane);
+                myWelcomeScreen.revalidate();
+                myWelcomeScreen.repaint();
+                NPViewItemsScreen(sortType);
+            }
         }
 
     }
@@ -600,7 +659,7 @@ public class SellerGUI {
                         "Your item has been successfully edited our system.\nYou may continue to edit the same item or click View Storefront to review your item list.",
                         "Success!", JOptionPane.PLAIN_MESSAGE);
                 myWelcomeScreen.remove(scrollPane);
-                NPViewItemsScreen();
+                NPViewItemsScreen(sortType);
             }
             else {
                 JOptionPane.showMessageDialog(myMainScreen,
@@ -686,7 +745,7 @@ public class SellerGUI {
                             "Your item has been successfully entered into our system.\nYou may continue entering items or click View Storefront to review your item list.",
                             "Success!", JOptionPane.PLAIN_MESSAGE);
                     myWelcomeScreen.remove(scrollPane);
-                    NPViewItemsScreen();
+                    NPViewItemsScreen(sortType);
                 }
                 else {
                     JOptionPane.showMessageDialog(myMainScreen,
@@ -720,7 +779,7 @@ public class SellerGUI {
                     myWelcomeScreen.remove(scrollPane);
                     myWelcomeScreen.revalidate();
                     myWelcomeScreen.repaint();
-                    NPViewItemsScreen();
+                    NPViewItemsScreen(sortType);
                     JOptionPane.showMessageDialog(myMainScreen,
                             "Item deleted!.",
                             "Success!",
