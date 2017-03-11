@@ -296,7 +296,11 @@ public class GUI {
                             noUserFoundLabel.setText("YOU GOT BANNED!!HAHAHAH!!!!!!!!");
                             noUserFoundLabel.setVisible(true);
                         } else {
-                            if (user.getType()== 2) {
+                            if (user.getType()== 1) {
+                                BuyerGUI buyerGUI = new BuyerGUI(user, containerPanel, cLayout);
+                                clearTextFields();
+                                buyerGUI.start();
+                            } else if (user.getType()== 2) {
                                 SellerGUI sellerGUI = new SellerGUI(user, containerPanel, cLayout);
                                 clearTextFields();
                                 sellerGUI.start();

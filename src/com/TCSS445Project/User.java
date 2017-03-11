@@ -17,6 +17,10 @@ public class User {
     int isBanned;
     int type;
 
+    public User() {
+
+    }
+
     public User(int theUserID, String theName, String theUsername, String thePassword,
                 String theEmail, String thePhoneNumber, int theIsBanned, int theType){
         userID = theUserID;

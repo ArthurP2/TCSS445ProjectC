@@ -154,5 +154,33 @@ public class DB {
         return noProblem;
     }
 
+    public ArrayList<User> getAllSellers() {
+        String query = "SELECT * FROM apanlili.user WHERE " +
+                "type = 2 AND isBanned = 0;";
+        System.out.println(query);
+
+        ArrayList<User> sellers = new ArrayList<User>();
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            try {
+                while (rs.next()) {
+                    User seller = new User();
+                    seller.setUserID(rs.getInt(1));
+                    seller.setName(rs.getString(2));
+                    seller.setUsername(rs.getString(3));
+                    seller.setPassword(rs.getString(4));
+                    seller.setEmail(rs.getString(5));
+                    seller.setPhoneNumber(rs.getString(6));
+                    seller.setIsBanned(rs.getInt(7));
+                    seller.setType(rs.getInt(8));
+                    sellers.add(seller);
+                }
+            } catch (Exception e) {
+            }
+        } catch (Exception e) {
+        }
+        return sellers;
+    }
 
 }
