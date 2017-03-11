@@ -174,24 +174,16 @@ public class DB {
         return list;
     }
 
-    public boolean removeItem(int itemID){
-        String query = "SELECT * FROM apanlili.item WHERE itemID='" + itemID + "';";
-        System.out.println("FINDITEM" + query);
-        boolean noProblem = false;
-        try {
-            Statement stmt = null;
-            stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            while (rs.next())
-                if ((rs.getInt(1) > 0)) {
-                    noProblem = true;
-                }
-        }catch (Exception e) {
-            System.out.println(e);
-        }
+
+
+    public boolean removeItem(int itemID, int userID){
+            String query = "SELECT * FROM apanlili.item WHERE itemID='" + itemID + "';";
+            System.out.println("FINDITEM" + query);
+        boolean noProblem = checkItemExists(itemID, userID);
+
         if (noProblem){
-            query = "DELETE FROM apanlili.item WHERE itemID='" + itemID + "';";
-            System.out.println("DESTORYITEM" + query);
+           query = "DELETE FROM apanlili.item WHERE itemID='" + itemID + "';";
+            System.out.println(query);
             try {
                 Statement stmt = null;
                 stmt = conn.createStatement();
@@ -201,6 +193,92 @@ public class DB {
                 noProblem = false;
                 System.out.println(e);
             }
+        }
+        return noProblem;
+    }
+
+    public boolean checkItemExists(int itemID, int userID) {
+        String query = "SELECT * FROM apanlili.item WHERE (itemID='" + itemID + "' AND sellerID='" + userID + "');";
+        System.out.println(query);
+        boolean noProblem = false;
+        try {
+            Statement stmt = null;
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next())
+                if ((rs.getInt(1) > 0)) {
+                    noProblem = true;
+                }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        return noProblem;
+    }
+
+    public boolean editItem(int itemID, int sellerID, Item theItem, boolean array[]) {
+        String query = "SELECT * FROM apanlili.item WHERE " +
+                "(itemID='" + itemID + "' AND sellerID='" + sellerID + "');";
+        System.out.println(query);
+        System.out.println("SIZE" + theItem.getSize() + array[5]);
+        Item item = new Item();
+        try {
+            Statement stmt = null;
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            while (rs.next()) {
+                item.setItemID(theItem.getItemID());
+                item.setSellerID(theItem.getSellerID());
+                System.out.println("1");
+                if (array[0])
+                    item.setName(theItem.getName());
+                else
+                    item.setName(rs.getString(3));
+                System.out.println("2");
+                if (array[1])
+                   item.setDescription(theItem.getDescription());
+                else
+                    item.setDescription(rs.getString(4));
+                System.out.println("3");
+                if (array[2])
+                    item.setQuantity(theItem.getQuantity());
+                else
+                    item.setQuantity(rs.getInt(5));
+                System.out.println("4");
+                if (array[3])
+                    item.setPrice(theItem.getPrice());
+                else
+                    item.setPrice(rs.getDouble(6));
+                System.out.println("5");
+                if (array[4])
+                    item.setConditionType(theItem.getConditionType());
+                else
+                    item.setConditionType(rs.getString(7));
+                System.out.println("6");
+                if (array[5])
+                    item.setSize(theItem.getSize());
+                else
+                    item.setSize(rs.getString(8));
+                System.out.println("7");
+                if (array[6])
+                    item.setComment(theItem.getComment());
+                else
+                    item.setComment(rs.getString(9));
+            }
+        } catch (Exception e) {
+            System.out.println(e);
+        }
+        query = "UPDATE apanlili.item SET name='" + item.getName() + "', description='" + item.getDescription() + "', quantity='" + item.getQuantity() + "'," +
+                " price='" + item.getPrice() + "', conditionType='" + item.getConditionType() + "', size='" + item.getSize() + "', comment='" + item.getComment() + "'" +
+                " WHERE itemID='" + itemID + "' AND sellerID='" + sellerID + "';";
+        System.out.println(query);
+        boolean noProblem = false;
+        try {
+            Statement stmt = null;
+            stmt = conn.createStatement();
+            stmt.executeUpdate(query);
+            noProblem = true;
+        } catch (Exception e) {
+            System.out.println(e);
         }
         return noProblem;
     }
