@@ -158,8 +158,8 @@ public class DB {
                     item.setSellerID(rs.getInt(2));
                     item.setName(rs.getString(3));
                     item.setDescription(rs.getString(4));
-                    item.setQuantity(rs.getInt(5));
-                    item.setPrice(rs.getDouble(6));
+                    item.setPrice(rs.getDouble(5));
+                    item.setQuantity(rs.getInt(6));
                     item.setConditionType(rs.getString(7));
                     item.setSize(rs.getString(8));
                     item.setComment(rs.getString(9));

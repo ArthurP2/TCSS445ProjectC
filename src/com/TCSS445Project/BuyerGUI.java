@@ -99,6 +99,10 @@ public class BuyerGUI {
     private ButtonBuilder myOptionButtons;
     private ButtonBuilder myCartButtons;
 
+    private JPanel cartHeader;
+    private JLabel totalPriceLabel;
+    private String theCost;
+
 
     private int[] myDate;     //Used to capture the date the user picks on the calendar. 0 = year, 1 = month, 2 = day
 
@@ -202,6 +206,11 @@ public class BuyerGUI {
         cartScrollPane = new JScrollPane(myCartItemTable);
         myViewCartScreen.add(cartScrollPane, BorderLayout.CENTER);
 
+        theCost = new String();
+        totalPriceLabel = new JLabel(theCost);
+        cartHeader = new JPanel(new BorderLayout());
+        cartHeader.add(totalPriceLabel, BorderLayout.EAST);
+        myViewCartScreen.add(cartHeader, BorderLayout.NORTH);
 
         myMainScreen.add(myMainButtonsPane, BorderLayout.SOUTH);
         myOptionButtons.getButton(0).setEnabled(false);
@@ -322,6 +331,9 @@ public class BuyerGUI {
         db.close();
         System.out.println(mySellerItems.size());
         Object[][] data = new Object[mySellerItems.size()][ITEM_COL_NUMS];
+
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+
         int itemID = 1;
         //for (int k = 0; k < COLUMNNUMBERS; k++) {
         //	data[0][k] = COLUMNNAMES[k];
@@ -331,7 +343,7 @@ public class BuyerGUI {
                 if (j == 0) data[itemID-1][j] = i.getItemID();
                 if (j == 1) data[itemID-1][j] = i.getName();
                 if (j == 2) data[itemID-1][j] = i.getConditionType();
-                if (j == 3) data[itemID-1][j] = "$" + i.getPrice() + "0";
+                if (j == 3) data[itemID-1][j] = new String(formatter.format(i.getPrice()));
             }
             itemID++;
         }
@@ -358,7 +370,11 @@ public class BuyerGUI {
         db.close();
         System.out.println(myCartItems.size());
         Object[][] data = new Object[myCartItems.size()][CART_COL_NUMS];
+
+        NumberFormat formatter = NumberFormat.getCurrencyInstance();
+
         int itemID = 1;
+        double totalPrice = 0;
         //for (int k = 0; k < COLUMNNUMBERS; k++) {
         //	data[0][k] = COLUMNNAMES[k];
         //}
@@ -368,18 +384,9 @@ public class BuyerGUI {
                 if (j == 1) data[itemID-1][j] = i.getSellerID();
                 if (j == 2) data[itemID-1][j] = i.getName();
                 if (j == 3) data[itemID-1][j] = i.getConditionType();
-                if (j == 4) data[itemID-1][j] = "$" + i.getPrice() + "0";
-
-				/*
-                                if (j == 4) {
-					if (myBidder.viewBids().containsKey(i)) {
-						data[itemID][j] = myBidder.viewBids().get(i);
-					} else {
-						data[itemID][j] = null;
-					}
-				}
-                                */
+                if (j == 4) data[itemID-1][j] = new String(formatter.format(i.getPrice()));
             }
+            totalPrice += i.getPrice();
             itemID++;
         }
         //if (myItems.size() == 0)
@@ -387,12 +394,22 @@ public class BuyerGUI {
 
         myCartItemTable = new JTable(data, CARTCOLUMNNAMES);
         cartScrollPane = new JScrollPane(myCartItemTable);
+        theCost = "SUBTOTAL: " + new String(formatter.format(totalPrice));
         //myViewItemsScreen.setLayout(new BorderLayout());
+        totalPriceLabel = new JLabel(theCost);
         JLabel viewingSellerItems = new JLabel("My Cart");
+
+        cartHeader = new JPanel(new BorderLayout());
+        cartHeader.add(viewingSellerItems, BorderLayout.WEST);
+        cartHeader.add(totalPriceLabel, BorderLayout.EAST);
+
+        totalPriceLabel.setFont(new Font(viewingSellerItems.getFont().getName(),
+                viewingSellerItems.getFont().getStyle(),
+                20));
         viewingSellerItems.setFont(new Font(viewingSellerItems.getFont().getName(),
                 viewingSellerItems.getFont().getStyle(),
                 30));
-        myViewCartScreen.add(viewingSellerItems, BorderLayout.NORTH);
+        myViewCartScreen.add(cartHeader, BorderLayout.NORTH);
         myViewCartScreen.add(cartScrollPane, BorderLayout.CENTER);
         myCartItemTable.repaint();
         cartScrollPane.repaint();
@@ -467,6 +484,7 @@ public class BuyerGUI {
         @Override
         public void actionPerformed(ActionEvent e) {
             myViewCartScreen.remove(cartScrollPane);
+            myViewCartScreen.remove(cartHeader);
             myViewCartScreen.revalidate();
             myViewSellersScreen.repaint();
             ViewCartItemsScreen();
@@ -525,6 +543,7 @@ public class BuyerGUI {
                 db.close();
                 if (success) {
                     myViewCartScreen.remove(cartScrollPane);
+                    myViewCartScreen.remove(cartHeader);
                     myViewCartScreen.revalidate();
                     myViewSellersScreen.repaint();
                     ViewCartItemsScreen();
