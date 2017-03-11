@@ -190,6 +190,19 @@ public class BuyerGUI {
         myMainScreen.setLayout(new BorderLayout());
         setupButtonPane();
 
+        mySellerTable = new JTable();
+        scrollPane = new JScrollPane(mySellerTable);
+        myViewSellersScreen.add(scrollPane, BorderLayout.CENTER);
+
+        mySellerItemTable = new JTable();
+        itemScrollPane = new JScrollPane(mySellerItemTable);
+        myViewSellerItemsScreen.add(itemScrollPane, BorderLayout.CENTER);
+
+        myCartItemTable = new JTable();
+        cartScrollPane = new JScrollPane(myCartItemTable);
+        myViewCartScreen.add(cartScrollPane, BorderLayout.CENTER);
+
+
         myMainScreen.add(myMainButtonsPane, BorderLayout.SOUTH);
         myOptionButtons.getButton(0).setEnabled(false);
 //        myFrame.add(myMainScreen, BorderLayout.SOUTH);
@@ -408,6 +421,9 @@ public class BuyerGUI {
         public void actionPerformed(ActionEvent e) {
             int inputValid = validInput();
             if (inputValid != 0) {
+                myViewSellerItemsScreen.remove(itemScrollPane);
+                myViewSellerItemsScreen.revalidate();
+                myViewSellerItemsScreen.repaint();
                 ViewSellerItemsScreen(inputValid);
                 myOptionButtons.getButton(0).setEnabled(true);
                 myCartButtons.getButton(0).setVisible(false);
@@ -427,6 +443,9 @@ public class BuyerGUI {
     class ViewSellersList implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            myViewSellersScreen.remove(scrollPane);
+            myViewSellersScreen.revalidate();
+            myViewSellersScreen.repaint();
             ViewSellersScreen();
             myOptionButtons.getButton(0).setEnabled(false);
             myOptionButtons.getButton(1).setEnabled(true);
@@ -437,8 +456,8 @@ public class BuyerGUI {
             myInputHint.setText(SELECT_STORE);
             myInputField.setValue(null);
 //            myViewSellerItemsScreen.remove(itemScrollPane);
-            myViewCartScreen.add(new ScrollPane(), BorderLayout.CENTER);
-            myViewSellerItemsScreen.add(new ScrollPane(), BorderLayout.CENTER);
+//            myViewCartScreen.add(new ScrollPane(), BorderLayout.CENTER);
+//            myViewSellerItemsScreen.add(new ScrollPane(), BorderLayout.CENTER);
             myLocalCLayout.show(myLocalContainer, BuyerPANEL);
 //            myLocalContainer.repaint();
         }
@@ -447,9 +466,12 @@ public class BuyerGUI {
     class ViewCartList implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
+            myViewCartScreen.remove(cartScrollPane);
+            myViewCartScreen.revalidate();
+            myViewSellersScreen.repaint();
             ViewCartItemsScreen();
             myCartButtons.getButton(0).setVisible(false);
-            myCartButtons.getButton(1).setVisible(true);
+            myCartButtons.getButton(1).setVisible(false);
             myCartButtons.getButton(2).setVisible(true);
             myOptionButtons.getButton(0).setEnabled(true);
             myOptionButtons.getButton(1).setEnabled(false);
@@ -502,9 +524,14 @@ public class BuyerGUI {
                 boolean success = db.removeFromCart(user.getUserID(), inputIsValid);
                 db.close();
                 if (success) {
+                    myViewCartScreen.remove(cartScrollPane);
+                    myViewCartScreen.revalidate();
+                    myViewSellersScreen.repaint();
+                    ViewCartItemsScreen();
                     JOptionPane.showMessageDialog(myMainScreen,
                             "Item removed from cart!");
                     myInputField.setValue(null);
+
                 } else {
                     JOptionPane.showMessageDialog(myMainScreen,
                             "Remove from cart failed!");
