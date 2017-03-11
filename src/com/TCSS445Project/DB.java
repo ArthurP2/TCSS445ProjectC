@@ -373,6 +373,65 @@ public class DB {
         return sellers;
     }
 
+    public ArrayList<User> getAllUsers() {
+        String query = "SELECT * FROM apanlili.user WHERE " +
+                "type != 3;";
+        System.out.println(query);
+
+        ArrayList<User> users = new ArrayList<User>();
+        try {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            try {
+                while (rs.next()) {
+                    User user = new User();
+                    user.setUserID(rs.getInt(1));
+                    user.setName(rs.getString(2));
+                    user.setUsername(rs.getString(3));
+                    user.setPassword(rs.getString(4));
+                    user.setEmail(rs.getString(5));
+                    user.setPhoneNumber(rs.getString(6));
+                    user.setIsBanned(rs.getInt(7));
+                    user.setType(rs.getInt(8));
+                    users.add(user);
+                }
+            } catch (Exception e) {
+            }
+        } catch (Exception e) {
+        }
+        return users;
+    }
+
+    public boolean banUser(int userID){
+        String query = "UPDATE apanlili.user SET isBanned=1 WHERE userID=" + userID + ";";
+        System.out.println(query);
+        boolean success = false;
+        try {
+            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
+            stmt.executeUpdate(query);
+            success = true;
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return success;
+    }
+
+    public boolean unBanUser(int userID){
+        String query = "UPDATE apanlili.user SET isBanned=0 WHERE userID=" + userID + ";";
+        System.out.println(query);
+        boolean success = false;
+        try {
+            Statement stmt = conn.createStatement();
+            stmt = conn.createStatement();
+            stmt.executeUpdate(query);
+            success = true;
+        } catch (Exception e){
+            System.out.println(e);
+        }
+        return success;
+    }
+
     public ArrayList<User> getAllSellersSorted(String sortType) {
         String query = "SELECT * FROM apanlili.user WHERE " +
                 "type = 2 AND isBanned = 0 ORDER BY " + sortType + ";";

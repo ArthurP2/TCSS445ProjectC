@@ -12,11 +12,11 @@ import javax.swing.border.Border;
 import javax.swing.text.NumberFormatter;
 
 /**
- * The GUI for users that are represented as Seller
+ * The GUI for users that are represented as Buyer
  * organizations in the system.
  *
- * @author Jacob Ackerman
- * @version 12.1.2016.001A
+ * @author Kyle Phan
+ * @version 3/11/2017
  */
 
 public class BuyerGUI {
@@ -28,8 +28,6 @@ public class BuyerGUI {
     private final static String INPUTPANEL = "Login Page";
     private final static String BuyerCARD = "Buyer Welcome Card";
     private final static String BuyerPANEL = "Buyer Page";
-    private final static String SellerREQUESTPANEL = "Seller Storefront Request Page";
-    private static final String NP_CONFIRMATION_SCREEN = "NP Confirmation Screen";
     private static final String NP_Storefront_VIEW_SCREEN = "All Stores View";
     private static final String VIEW_CART = "Cart Screen";
 
@@ -120,7 +118,6 @@ public class BuyerGUI {
         db = new DB();
         myMainContainer = theContainer;
         myMainCLayout = theCLayout;
-        myDate = new int[3];
 
         myLocalContainer = new JPanel();
         myLocalCLayout = new CardLayout();

@@ -306,6 +306,10 @@ public class GUI {
                                 SellerGUI sellerGUI = new SellerGUI(user, containerPanel, cLayout);
                                 clearTextFields();
                                 sellerGUI.start();
+                            } else if (user.getType()== 3) {
+                                ManagerGUI managerGUI = new ManagerGUI(user, containerPanel, cLayout);
+                                clearTextFields();
+                                managerGUI.start();
                             }
 
                             System.out.println("SignedIn");
