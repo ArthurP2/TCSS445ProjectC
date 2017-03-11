@@ -1,6 +1,8 @@
 package com.TCSS445Project;
 
 
+import com.sun.scenario.effect.impl.sw.java.JSWBlend_COLOR_BURNPeer;
+
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
@@ -468,9 +470,18 @@ public class GUI {
      */
     private void registerButtonPanel() {
         JButton createAccount = new JButton("Create Account");
+        JButton backUp = new JButton("Back");
+        backUp.addActionListener(new ActionListener() {
+            public void actionPerformed(ActionEvent e) {
+                clearTextFields();
+                cLayout.show(containerPanel, INPUTPANEL);
+            }
+        });
+        backUp.setPreferredSize(new Dimension(REG_BTN_WIDTH, BTN_HEIGHT));
         createAccount.setPreferredSize(new Dimension(REG_BTN_WIDTH, BTN_HEIGHT));
 
         regisButtonPanel.add(createAccount);
+        regisButtonPanel.add(backUp);
         createAccount.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 //Checks for empty fields, if so 'All fields' label turns red.
