@@ -1,12 +1,5 @@
 package com.TCSS445Project;
 
-/*
- * TCSS 305 - Assignment 3: SnapShop
- * Jacob Ackerman - 11/2/15
- */
-
-//package gui;
-
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JPanel;
@@ -15,7 +8,7 @@ import javax.swing.JPanel;
  * This class is designed to build and manage an array of JButtons.
  *
  * @author Jacob Ackerman
- * @version v1.0 - 11/1/15
+ * @version v1.0 - 2/2/17
  */
 public class ButtonBuilder extends JPanel {
 

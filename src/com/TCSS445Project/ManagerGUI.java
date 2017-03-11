@@ -11,10 +11,10 @@ import javax.swing.*;
 import javax.swing.text.NumberFormatter;
 
 /**
- * The GUI for users that are represented as Seller
+ * The GUI for users that are represented as Manager
  * organizations in the system.
  *
- * @author Kyle Phan
+ * @author Biirhanu Zerefa
  * @version 3/11/2017
  */
 
@@ -217,8 +217,20 @@ public class ManagerGUI {
                 if (j == 3) data[sellerID-1][j] = i.getPassword();
                 if (j == 4) data[sellerID-1][j] = i.getEmail();
                 if (j == 5) data[sellerID-1][j] = i.getPhoneNumber();
-                if (j == 6) data[sellerID-1][j] = i.getIsBanned();
-                if (j == 7) data[sellerID-1][j] = i.getType();
+                if (j == 6) {
+                    if (i.getIsBanned()==0) {
+                        data[sellerID-1][j] = "Not Banned";
+                    } else if (i.getIsBanned()==1) {
+                        data[sellerID-1][j] = "Banned";
+                    }
+                }
+                if (j == 7) {
+                    if (i.getType()==1) {
+                        data[sellerID-1][j] = "Buyer";
+                    } else if (i.getType()==2) {
+                        data[sellerID-1][j] = "Seller";
+                    }
+                }
             }
             sellerID++;
         }

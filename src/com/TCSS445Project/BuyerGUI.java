@@ -85,8 +85,6 @@ public class BuyerGUI {
     private JScrollPane itemScrollPane;
     private JScrollPane cartScrollPane;
 
-    private JTextArea NO_ITEM_WELCOME;
-
     private JTable mySellerTable;
     private JTable mySellerItemTable;
     private JTable myCartItemTable;
@@ -126,13 +124,8 @@ public class BuyerGUI {
         myInputPane = new JPanel(new GridBagLayout());
         myInputHint = new JLabel(SELECT_STORE);
         myMainButtonsPane = new JPanel(new GridLayout(3,1));
-        //CONFIRMATION_MESSAGE = new JTextArea();
         myViewSellerItemsScreen = new JPanel(new BorderLayout());
         myViewCartScreen = new JPanel(new BorderLayout());
-
-        NO_ITEM_WELCOME = new JTextArea("Welcome, " + user.getName() + "\n"
-                + "\nYou currently have no items in your storefront.\n"
-                + "Please click \"Add item\" if you would like to add an item.");
 
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
@@ -142,8 +135,6 @@ public class BuyerGUI {
         formatter.setAllowsInvalid(false);
         formatter.setCommitsOnValidEdit(true);
         myInputField = new JFormattedTextField(formatter);
-
-        NO_ITEM_WELCOME.setEditable(false);
 
         mySorter = new JComboBox(new String[] {"Sort by...", "ID # ASC", "ID # DESC", "Name ASC", "Name DESC"});
 
@@ -165,7 +156,6 @@ public class BuyerGUI {
 
         myMainContainer.add(myMainScreen, BuyerCARD);
         myMainCLayout.show(myMainContainer, BuyerCARD);
-
     }
 
 
@@ -217,8 +207,6 @@ public class BuyerGUI {
 
         myMainScreen.add(myMainButtonsPane, BorderLayout.SOUTH);
         myOptionButtons.getButton(0).setEnabled(false);
-//        myFrame.add(myMainScreen, BorderLayout.SOUTH);
-//        myOptionButtons.getButton(0)
         myOptionButtons.getButton(0).addActionListener(new ViewSellersList());
         myOptionButtons.getButton(1).addActionListener(new ViewCartList());
         myOptionButtons.getButton(2).addActionListener(new LogOut());
@@ -260,7 +248,6 @@ public class BuyerGUI {
         c.gridx = 1;
         c.gridy = 1;
 
-//        myInputPane.setMaximumSize(new Dimension(25, 25));
         myMainButtonsPane.add(myInputPane);
         myMainButtonsPane.add(myCartButtons);
         myMainButtonsPane.add(myOptionButtons);
@@ -270,22 +257,12 @@ public class BuyerGUI {
      * This method creates the JPanel which should contain the Welcome text areas.
      */
     private void BuyerWelcomeScreen() {
-        //System.out.println(myNPO.getStorefront());
-        //System.out.println("result: " + myCal.getStorefront(myNPO.getUserName()));
-        //System.out.println(myNPO.getUserName());
-//        if (myCal.getStorefront(myNPO.getUserName()) == null)
         JLabel viewingSellers = new JLabel("Viewing All Storefronts");
         viewingSellers.setFont(new Font(viewingSellers.getFont().getName(),
                                         viewingSellers.getFont().getStyle(),
                                         30));
         myViewSellersScreen.add(viewingSellers, BorderLayout.NORTH);
-        myViewSellersScreen.add(NO_ITEM_WELCOME, BorderLayout.CENTER);
         ViewSellersScreen("none");
-//        else
-//        {
-//            initializeHasStorefrontMessage();
-//            myViewSellersScreen.add(HAS_Storefront_WELCOME, BorderLayout.CENTER);
-//        }
     }
 
     private boolean ViewSellersScreen(String theSortType) {
@@ -300,9 +277,6 @@ public class BuyerGUI {
         System.out.println(mySellers.size());
         Object[][] data = new Object[mySellers.size()][COLUMNNUMBERS];
         int sellerID = 1;
-        //for (int k = 0; k < COLUMNNUMBERS; k++) {
-        //	data[0][k] = COLUMNNAMES[k];
-        //}
         for (User i : mySellers) {
             for (int j = 0; j < COLUMNNUMBERS; j++) {
                 if (j == 0) data[sellerID-1][j] = i.getUserID();
@@ -313,11 +287,8 @@ public class BuyerGUI {
             sellerID++;
         }
         mySellerTable = new JTable(data, SELLERCOLUMNNAMES);
-//		myViewItemsScreen.setLayout(new BorderLayout());
-//		myViewItemsScreen.add(mySellerTable, BorderLayout.CENTER);
 
         scrollPane = new JScrollPane(mySellerTable);
-        //myViewItemsScreen.setLayout(new BorderLayout());
         myViewSellersScreen.add(scrollPane, BorderLayout.CENTER);
         mySellerTable.repaint();
         scrollPane.repaint();
@@ -334,9 +305,6 @@ public class BuyerGUI {
         NumberFormat formatter = NumberFormat.getCurrencyInstance();
 
         int itemID = 1;
-        //for (int k = 0; k < COLUMNNUMBERS; k++) {
-        //	data[0][k] = COLUMNNAMES[k];
-        //}
         for (Item i : mySellerItems) {
             for (int j = 0; j < ITEM_COL_NUMS; j++) {
                 if (j == 0) data[itemID-1][j] = i.getItemID();
@@ -346,12 +314,8 @@ public class BuyerGUI {
             }
             itemID++;
         }
-        //if (myItems.size() == 0)
-        //theButtons.getButton(2).setEnabled(false);
-
         mySellerItemTable = new JTable(data, ITEMCOLUMNNAMES);
         itemScrollPane = new JScrollPane(mySellerItemTable);
-        //myViewItemsScreen.setLayout(new BorderLayout());
         JLabel viewingSellerItems = new JLabel("Viewing Store Items");
         viewingSellerItems.setFont(new Font(viewingSellerItems.getFont().getName(),
                 viewingSellerItems.getFont().getStyle(),
@@ -374,9 +338,6 @@ public class BuyerGUI {
 
         int itemID = 1;
         double totalPrice = 0;
-        //for (int k = 0; k < COLUMNNUMBERS; k++) {
-        //	data[0][k] = COLUMNNAMES[k];
-        //}
         for (Item i : myCartItems) {
             for (int j = 0; j < CART_COL_NUMS; j++) {
                 if (j == 0) data[itemID-1][j] = i.getItemID();
@@ -388,13 +349,10 @@ public class BuyerGUI {
             totalPrice += i.getPrice();
             itemID++;
         }
-        //if (myItems.size() == 0)
-        //theButtons.getButton(2).setEnabled(false);
 
         myCartItemTable = new JTable(data, CARTCOLUMNNAMES);
         cartScrollPane = new JScrollPane(myCartItemTable);
         theCost = "SUBTOTAL: " + new String(formatter.format(totalPrice));
-        //myViewItemsScreen.setLayout(new BorderLayout());
         totalPriceLabel = new JLabel(theCost);
         JLabel viewingSellerItems = new JLabel("My Cart");
 
@@ -448,7 +406,6 @@ public class BuyerGUI {
                 myInputHint.setText(SELECT_ITEM);
                 myInputField.setValue(null);
                 myLocalCLayout.show(myLocalContainer, NP_Storefront_VIEW_SCREEN);
-//                myLocalContainer.repaint();
             } else {
                 JOptionPane.showMessageDialog(myMainScreen,
                         "Please enter a valid Seller ID#");
@@ -473,11 +430,7 @@ public class BuyerGUI {
 
             myInputHint.setText(SELECT_STORE);
             myInputField.setValue(null);
-//            myViewSellerItemsScreen.remove(itemScrollPane);
-//            myViewCartScreen.add(new ScrollPane(), BorderLayout.CENTER);
-//            myViewSellerItemsScreen.add(new ScrollPane(), BorderLayout.CENTER);
             myLocalCLayout.show(myLocalContainer, BuyerPANEL);
-//            myLocalContainer.repaint();
         }
     }
 
@@ -497,9 +450,7 @@ public class BuyerGUI {
             myOptionButtons.getButton(1).setEnabled(false);
             myInputHint.setText(SELECT_ITEM);
             myInputField.setValue(null);
-//            myViewCartScreen.remove(cartScrollPane);
             myLocalCLayout.show(myLocalContainer, VIEW_CART);
-//            myLocalContainer.repaint();
         }
     }
 
