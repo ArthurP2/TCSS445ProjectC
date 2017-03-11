@@ -103,6 +103,9 @@ public class BuyerGUI {
     private JLabel totalPriceLabel;
     private String theCost;
 
+    private JComboBox mySorter;
+    private String sortType;
+
 
     private int[] myDate;     //Used to capture the date the user picks on the calendar. 0 = year, 1 = month, 2 = day
 
@@ -145,6 +148,7 @@ public class BuyerGUI {
 
         NO_ITEM_WELCOME.setEditable(false);
 
+        mySorter = new JComboBox(new String[] {"Sort by...", "ID # ASC", "ID # DESC", "Name ASC", "Name DESC"});
 
     }
 
@@ -159,7 +163,6 @@ public class BuyerGUI {
     public void start() {
         myOptionButtons = new ButtonBuilder(new String[] {"View All Stores", "My Cart", "Logout"});
         myCartButtons = new ButtonBuilder(new String[] {"Visit Storefront", "Add to Cart", "Remove from Cart", "Clear Input"});
-
 
         BuyerScreenController();
 
@@ -193,6 +196,9 @@ public class BuyerGUI {
     private void BuyerScreenController() {
         myMainScreen.setLayout(new BorderLayout());
         setupButtonPane();
+
+        mySorter.addActionListener(new sortItem());
+        myMainScreen.add(mySorter, BorderLayout.NORTH);
 
         mySellerTable = new JTable();
         scrollPane = new JScrollPane(mySellerTable);
@@ -233,13 +239,16 @@ public class BuyerGUI {
 
         myLocalCLayout.show(myLocalContainer, BuyerPANEL); // Inital Screen
 
-
         myMainScreen.add(myLocalContainer, BorderLayout.CENTER);
 
     }
 
     private void setupButtonPane() {
+
+
+        // Bottom button pane
         myOptionButtons.buildButtons();
+
         myCartButtons.buildButtons();
         myCartButtons.getButton(1).setVisible(false);
         myCartButtons.getButton(2).setVisible(false);
@@ -274,7 +283,7 @@ public class BuyerGUI {
                                         30));
         myViewSellersScreen.add(viewingSellers, BorderLayout.NORTH);
         myViewSellersScreen.add(NO_ITEM_WELCOME, BorderLayout.CENTER);
-        ViewSellersScreen();
+        ViewSellersScreen("none");
 //        else
 //        {
 //            initializeHasStorefrontMessage();
@@ -282,9 +291,14 @@ public class BuyerGUI {
 //        }
     }
 
-    private boolean ViewSellersScreen() {
+    private boolean ViewSellersScreen(String theSortType) {
+        ArrayList<User> mySellers;
         db.start();
-        ArrayList<User> mySellers = db.getAllSellers();
+        if (!theSortType.equals("none")) {
+            mySellers = db.getAllSellersSorted(theSortType);
+        } else {
+            mySellers = db.getAllSellers();
+        }
         db.close();
         System.out.println(mySellers.size());
         Object[][] data = new Object[mySellers.size()][COLUMNNUMBERS];
@@ -298,21 +312,9 @@ public class BuyerGUI {
                 if (j == 1) data[sellerID-1][j] = i.getUsername();
                 if (j == 2) data[sellerID-1][j] = i.getEmail();
                 if (j == 3) data[sellerID-1][j] = i.getPhoneNumber();
-				/*
-                                if (j == 4) {
-					if (myBidder.viewBids().containsKey(i)) {
-						data[itemID][j] = myBidder.viewBids().get(i);
-					} else {
-						data[itemID][j] = null;
-					}
-				}
-                                */
             }
             sellerID++;
         }
-        //if (myItems.size() == 0)
-        //theButtons.getButton(2).setEnabled(false);
-
         mySellerTable = new JTable(data, SELLERCOLUMNNAMES);
 //		myViewItemsScreen.setLayout(new BorderLayout());
 //		myViewItemsScreen.add(mySellerTable, BorderLayout.CENTER);
@@ -442,6 +444,7 @@ public class BuyerGUI {
                 myViewSellerItemsScreen.revalidate();
                 myViewSellerItemsScreen.repaint();
                 ViewSellerItemsScreen(inputValid);
+                mySorter.setVisible(false);
                 myOptionButtons.getButton(0).setEnabled(true);
                 myCartButtons.getButton(0).setVisible(false);
                 myCartButtons.getButton(1).setVisible(true);
@@ -463,7 +466,8 @@ public class BuyerGUI {
             myViewSellersScreen.remove(scrollPane);
             myViewSellersScreen.revalidate();
             myViewSellersScreen.repaint();
-            ViewSellersScreen();
+            ViewSellersScreen("none");
+            mySorter.setVisible(true);
             myOptionButtons.getButton(0).setEnabled(false);
             myOptionButtons.getButton(1).setEnabled(true);
             myCartButtons.getButton(0).setVisible(true);
@@ -488,12 +492,13 @@ public class BuyerGUI {
             myViewCartScreen.revalidate();
             myViewSellersScreen.repaint();
             ViewCartItemsScreen();
+            mySorter.setVisible(false);
             myCartButtons.getButton(0).setVisible(false);
             myCartButtons.getButton(1).setVisible(false);
             myCartButtons.getButton(2).setVisible(true);
             myOptionButtons.getButton(0).setEnabled(true);
             myOptionButtons.getButton(1).setEnabled(false);
-            myInputHint.setText(SELECT_STORE);
+            myInputHint.setText(SELECT_ITEM);
             myInputField.setValue(null);
 //            myViewCartScreen.remove(cartScrollPane);
             myLocalCLayout.show(myLocalContainer, VIEW_CART);
@@ -506,6 +511,32 @@ public class BuyerGUI {
         public void actionPerformed(ActionEvent e) {
             myInputField.setValue(null);
         }
+    }
+
+    class sortItem implements ActionListener {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            System.out.println(mySorter.getSelectedIndex());
+            if (mySorter.getSelectedIndex() == 1) {
+                sortType = "userID ASC";
+            }
+            if (mySorter.getSelectedIndex() == 2) {
+                sortType = "userID DESC";
+            }
+            if (mySorter.getSelectedIndex() == 3) {
+                sortType= "name ASC";
+            }
+            if (mySorter.getSelectedIndex() == 4) {
+                sortType = "name DESC";
+            }
+            if (mySorter.getSelectedIndex() > 0) {
+                myViewSellersScreen.remove(scrollPane);
+                myViewSellersScreen.revalidate();
+                myViewSellersScreen.repaint();
+                ViewSellersScreen(sortType);
+            }
+        }
+
     }
 
     class AddToCart implements ActionListener {
