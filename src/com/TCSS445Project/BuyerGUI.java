@@ -81,10 +81,17 @@ public class BuyerGUI {
     private JPanel myViewCartScreen;
     private JPanel myMainButtonsPane; // Stores ALL buttons
     private JPanel myInputPane; // Stores Input prompt and textfield
+    /*
+     * Scroll panes used to hold the JTables incase the list gets too long to display
+     * on one page.
+     */
     private JScrollPane scrollPane;
     private JScrollPane itemScrollPane;
     private JScrollPane cartScrollPane;
 
+    /*
+     * JTables for displaying sellers, items, and items in my cart.
+     */
     private JTable mySellerTable;
     private JTable mySellerItemTable;
     private JTable myCartItemTable;
@@ -101,9 +108,6 @@ public class BuyerGUI {
 
     private JComboBox mySorter;
     private String sortType;
-
-
-    private int[] myDate;     //Used to capture the date the user picks on the calendar. 0 = year, 1 = month, 2 = day
 
     /**
      * Constructor for SellerGUI.
@@ -137,7 +141,6 @@ public class BuyerGUI {
         myInputField = new JFormattedTextField(formatter);
 
         mySorter = new JComboBox(new String[] {"Sort by...", "ID # ASC", "ID # DESC", "Name ASC", "Name DESC"});
-
     }
 
     /**
@@ -228,9 +231,10 @@ public class BuyerGUI {
 
     }
 
+    /**
+     * This method builds, places, and adds listeners to each of the buyer buttons.
+     */
     private void setupButtonPane() {
-
-
         // Bottom button pane
         myOptionButtons.buildButtons();
 
@@ -265,6 +269,12 @@ public class BuyerGUI {
         ViewSellersScreen("none");
     }
 
+    /**
+     * This method builds and fills in all the information into the JTables,
+     * calls the db method to get all sellers and adds them to the JTable.
+     *
+     * @return boolean false if no users, true if there are users
+     */
     private boolean ViewSellersScreen(String theSortType) {
         ArrayList<User> mySellers;
         db.start();
@@ -295,6 +305,12 @@ public class BuyerGUI {
         return (mySellers.size() > 0);
     }
 
+    /**
+     * This method builds and fills in all the information into the JTables,
+     * calls the db method to get all seller items and adds them to the JTable.
+     *
+     * @return boolean false if no users, true if there are users
+     */
     private boolean ViewSellerItemsScreen(int theSellerID) {
         db.start();
         ArrayList<Item> mySellerItems = db.getMyStoreItems(theSellerID);
@@ -327,6 +343,12 @@ public class BuyerGUI {
         return (mySellerItems.size() > 0);
     }
 
+    /**
+     * This method builds and fills in all the information into the JTables,
+     * calls the db method to get all items and adds them to the JTable.
+     *
+     * @return boolean false if no users, true if there are users
+     */
     private boolean ViewCartItemsScreen() {
         db.start();
         ArrayList<Item> myCartItems = db.getMyCartItems(user.getUserID());
@@ -373,6 +395,12 @@ public class BuyerGUI {
         return (myCartItems.size() > 0);
     }
 
+    /**
+     * This is a helper method that checks if the user's input is valid
+     * prevents users from entering 0 or negative numbers.
+     *
+     * @return int containing the users input, 0 if negative or 0 input.
+     */
     private int validInput() {
         Number input = (Number) myInputField.getValue();
         if (input == null)  {
@@ -382,7 +410,15 @@ public class BuyerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for logging out.
+     */
     class LogOut implements ActionListener {
+        /**
+         * Method that logs out and removes this GUI class when the
+         * logout button is clicked.
+         * @param e event when the logout button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             myMainCLayout.show(myMainContainer, INPUTPANEL);
@@ -390,7 +426,15 @@ public class BuyerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for viewing all seller items.
+     */
     class ViewStorefront implements ActionListener {
+        /**
+         * Method that views and updates the seller storefront display page
+         * by rebuilding the JTable and changing to relevant buttons.
+         * @param e event when the view storefront button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             int inputValid = validInput();
@@ -414,7 +458,15 @@ public class BuyerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for viewing all sellers.
+     */
     class ViewSellersList implements ActionListener {
+        /**
+         * Method that views and updates the seller display page
+         * by rebuilding the JTable and changing to relevant buttons.
+         * @param e event when the view storefront button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             myViewSellersScreen.remove(scrollPane);
@@ -434,7 +486,15 @@ public class BuyerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for viewing all items in cart.
+     */
     class ViewCartList implements ActionListener {
+        /**
+         * Method that views and updates the my cart display page
+         * by rebuilding the JTable and changing to relevant buttons.
+         * @param e event when the view storefront button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             myViewCartScreen.remove(cartScrollPane);
@@ -454,14 +514,29 @@ public class BuyerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for clearing the user input field.
+     */
     class ClearInput implements ActionListener {
+        /**
+         * Method that clears the user input field when clear button is clicked.
+         * @param e event when the clear button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             myInputField.setValue(null);
         }
     }
 
+    /**
+     * Inner class action listener that gets the sort type the user wants
+     */
     class sortItem implements ActionListener {
+        /**
+         * Method that gets the sort method the user wants from the ComboBox
+         * and calls a query execution with that sort type.
+         * @param e event when a different sort type is chosen from the ComboBox.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             System.out.println(mySorter.getSelectedIndex());
@@ -487,7 +562,15 @@ public class BuyerGUI {
 
     }
 
+    /**
+     * Inner class action listener for adding items to the cart.
+     */
     class AddToCart implements ActionListener {
+        /**
+         * Method that adds the item based on the entered item ID# when the
+         * add to cart button is clicked.
+         * @param e event when the add to cart button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             int inputIsValid = validInput();
@@ -512,7 +595,15 @@ public class BuyerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for removing items from the cart.
+     */
     class RemoveFromCart implements ActionListener {
+        /**
+         * Method that removes the item based on the entered item ID# when the
+         * remove from cart button is clicked.
+         * @param e event when the remove from cart button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             int inputIsValid = validInput();

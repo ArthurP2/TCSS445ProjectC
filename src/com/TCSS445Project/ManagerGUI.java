@@ -64,9 +64,9 @@ public class ManagerGUI {
     private JPanel myViewUsersScreen;	//JPanel that should contain the various Welcome JTextAreas. To be added in myLocalContainer only.
     private JPanel myMainButtonsPane; // Stores ALL buttons
     private JPanel myInputPane; // Stores Input prompt and textfield
-    private JScrollPane scrollPane;
+    private JScrollPane scrollPane; // Scrollpan that wiill hold the JTable of users
 
-    private JTable myUserTable;
+    private JTable myUserTable; // JTable to display all users
 
     private JLabel myInputHint;
     private JFormattedTextField myInputField;
@@ -74,8 +74,8 @@ public class ManagerGUI {
     private ButtonBuilder myOptionButtons;
 
     /**
-     * Constructor for SellerGUI.
-     * @param theUser is the Seller user.
+     * Constructor for ManagerGUI.
+     * @param theUser is the Manager user.
      * @param theContainer is the JPanel passed in from the main GUI, allows this GUI to use the same JFrame.
      * @param theCLayout is the CardLayout from the main GUI, allows this GUI to use the same JFrame.
      */
@@ -92,7 +92,6 @@ public class ManagerGUI {
         myInputPane = new JPanel(new GridBagLayout());
         myInputHint = new JLabel(SELECT_STORE);
         myMainButtonsPane = new JPanel(new GridLayout(3,1));
-        //CONFIRMATION_MESSAGE = new JTextArea();
 
         NumberFormat format = NumberFormat.getInstance();
         NumberFormatter formatter = new NumberFormatter(format);
@@ -105,7 +104,7 @@ public class ManagerGUI {
     }
 
     /**
-     * This method creates the Seller GUI.
+     * This method creates the Manager GUI.
      *
      * Creates the buttons with ButtonBuilder.
      * Calls ManagerScreenController which creates the main screen, adds all panels to the local CardLayout.
@@ -125,7 +124,7 @@ public class ManagerGUI {
 
 
     /**
-     * This is the main method that creates the structure for SellerGUI.
+     * This is the main method that creates the structure for ManagerGUI.
      *
      * myMainScreen is a JPanel that is always showing. Contains myOptionButtons in BorderLayout.SOUTH.
      * Contains myLocalContainer in BorderLayout.CENTER.
@@ -165,6 +164,9 @@ public class ManagerGUI {
 
     }
 
+    /**
+     * This method builds, places, and adds listeners to each of the manager buttons.
+     */
     private void setupButtonPane() {
         // Bottom button pane
         myOptionButtons.buildButtons();
@@ -201,6 +203,12 @@ public class ManagerGUI {
         ViewSellersScreen();
     }
 
+    /**
+     * This method builds and fills in all the information into the JTables,
+     * calls the db method to get all users and adds them to the JTable.
+     *
+     * @return boolean false if no users, true if there are users
+     */
     private boolean ViewSellersScreen() {
         ArrayList<User> myUsers;
         db.start();
@@ -243,6 +251,12 @@ public class ManagerGUI {
         return (myUsers.size() > 0);
     }
 
+    /**
+     * This is a helper method that checks if the user's input is valid
+     * prevents users from entering 0 or negative numbers.
+     *
+     * @return int containing the users input, 0 if negative or 0 input.
+     */
     private int validInput() {
         Number input = (Number) myInputField.getValue();
         if (input == null)  {
@@ -252,14 +266,29 @@ public class ManagerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for clearing the user input field.
+     */
     class ClearInput implements ActionListener {
+        /**
+         * Method that clears the user input field when clear button is clicked.
+         * @param e event when the clear button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             myInputField.setValue(null);
         }
     }
 
+    /**
+     * Inner class action listener for banning users.
+     */
     class BanUser implements ActionListener {
+        /**
+         * Method that bans the entered userID# when the ban user button
+         * is clicked.
+         * @param e event when the ban user button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             int inputIsValid = validInput();
@@ -288,7 +317,15 @@ public class ManagerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for unbanning users.
+     */
     class UnbanUser implements ActionListener {
+        /**
+         * Method that unbans the entered userID# when the unban user button
+         * is clicked.
+         * @param e event when the unban user button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             int inputIsValid = validInput();
@@ -317,7 +354,15 @@ public class ManagerGUI {
         }
     }
 
+    /**
+     * Inner class action listener for logging out.
+     */
     class LogOut implements ActionListener {
+        /**
+         * Method that logs out and removes this GUI class when the
+         * logout button is clicked.
+         * @param e event when the logout button is clicked.
+         */
         @Override
         public void actionPerformed(ActionEvent e) {
             myMainCLayout.show(myMainContainer, INPUTPANEL);
