@@ -7,8 +7,6 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 
@@ -26,8 +24,8 @@ import javax.swing.SpinnerNumberModel;
  * The GUI for users that are represented as Seller
  * organizations in the system.
  *
- * @author Jacob Ackerman
- * @version 12.1.2016.001A
+ * @author Arthur Panlilio
+ * @version 3/11/2017
  */
 
 public class SellerGUI {
@@ -46,8 +44,11 @@ public class SellerGUI {
     private static final String NP_ITEM_ADD_FORM = "NP Item Add Form";
     private static final String NP_ITEM_EDIT_FORM = "NP Item Edit Form";
 
+    //The database class
     private User user;
     private DB db;
+
+    //The item to be edited
     private int itemEditId;
 
     final static int COLUMNNUMBERS = 8;
@@ -78,9 +79,8 @@ public class SellerGUI {
     private CardLayout myMainCLayout;
 
     private JPanel myMainScreen;	//Contains myLocalContainer in BorderLayout.CENTER, myOptionButtons stay along the bottom
-    private JPanel myWelcomeScreen;	//JPanel that should contain the various Welcome JTextAreas. To be added in myLocalContainer only.
-    private JPanel myRequestScreen;	//JPanel that contains the Submit Storefront Request form. To be added in myLocalContainer only.
-    private JPanel myRequestCalendarScreen;	//JPanel that helps create myRequestScreen. To be added to myRequestScreen only.
+    private JPanel myWelcomeScreen;
+    private JPanel myRequestScreen;
     private JPanel myRequestFormScreen;
     private JPanel myConfirmation;
     private JPanel myViewStorefrontScreen;
@@ -88,10 +88,7 @@ public class SellerGUI {
     private JPanel myEditItemForm;
     private JScrollPane scrollPane;
 
-    private JTextArea NO_ITEM_WELCOME;
-    private static final JTextArea Storefront_REQUEST_HELP = new JTextArea("These are the next 30 days starting from today."
-            + "\nDays that are available will have a clickable button."
-            + "\nPlease select an available day to continue.");
+
 
 
     private JTable myItemTable;
@@ -138,7 +135,6 @@ public class SellerGUI {
         myMainScreen = new JPanel();
         myWelcomeScreen = new JPanel(new BorderLayout());
         myRequestScreen = new JPanel();
-        myRequestCalendarScreen = new JPanel();
         myRequestFormScreen = new JPanel();
         mySorter = new JComboBox(new String[] {"Sort by..", "Id", "Name", "Description", "Quantity", "Price", "Condition", "Size", "Comments"});
 
@@ -148,10 +144,8 @@ public class SellerGUI {
         myAddItemForm = new JPanel();
         myEditItemForm = new JPanel();
 
-        NO_ITEM_WELCOME = new JTextArea("Welcome, " + user.getName() + "\n"
-                + "\nYou currently have no items in your storefront.\n"
-                + "Please click \"Add item\" if you would like to add an item.");
 
+        //Fields for add item
         myItemName = new JTextField();
         myItemDesc = new JTextField();
         myItemQty = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
@@ -160,7 +154,7 @@ public class SellerGUI {
         myItemSize = new JComboBox(new String[] {"Select Size", "------------", "Tiny", "Small", "Medium", "Large", "Huge"});
         myItemComments = new JTextField();
 
-
+        //Fields for edit item
         myItemName2 = new JTextField();
         myItemDesc2 = new JTextField();
         myItemQty2 = new JSpinner(new SpinnerNumberModel(0, 0, 999, 1));
@@ -169,7 +163,6 @@ public class SellerGUI {
         myItemSize2 = new JComboBox(new String[] {"Select Size", "------------", "Tiny", "Small", "Medium", "Large", "Huge"});
         myItemComments2 = new JTextField();
 
-        NO_ITEM_WELCOME.setEditable(false);
 
     }
 
@@ -196,29 +189,13 @@ public class SellerGUI {
 
     /**
      * This is the main method that creates the structure for SellerGUI.
-     *
-     * myMainScreen is a JPanel that is always showing. Contains myOptionButtons in BorderLayout.SOUTH.
-     * Contains myLocalContainer in BorderLayout.CENTER.
-     *
-     * myLocalContainer holds all of the different panels that will need to change in this GUI.
-     * myLocalCLayout is used to swap between the different panels in myLocalContainer so that myMainScreen can
-     * stay the same and allow the buttons to always be present.
-     *
-     * When making new JPanels, you MUST create a static String that represents the new JPanel,
-     * and you must ONLY add the new JPanel to myLocalContainer.
-     *
-     * To Add a JPanel to myLocalContainer,
-     * myLocalContainer.add(XXXX, YYYY)		XXXX is the variable for the JPanel
-     * 										YYYY is the static String created to describe the panel.
-     *
-     * For ActionListeners, to switch to a specific JPanel, you must call
-     * myLocalCLayout.show(myLocalContainer, XXXXX)		XXXXX is the static String you created to describe the panel.
+
      */
     private void SellerScreenController() {
         myMainScreen.setLayout(new BorderLayout());
         myOptionButtons.buildButtons();
-        //myMainScreen.add(myOptionButtons, BorderLayout.SOUTH);
 
+        // adds the buttons to the button group
         mySorter.addActionListener(new sortItem());
         myOptionButtons.getButton(3).setEnabled(false);
         myOptionButtons.getButton(0).addActionListener(new AddItemForm());
@@ -229,7 +206,7 @@ public class SellerGUI {
 
 
         SellerWelcomeScreen();
-        SellerStorefrontRequestScreen();
+
 
 
         initializeAddItemForm();
@@ -259,7 +236,7 @@ public class SellerGUI {
     }
 
     /**
-     * This method creates the JPanel which should contain the Welcome text areas.
+     * This method creates the JPanel which should contain the main area.
      */
     private void SellerWelcomeScreen() {
         JLabel info = new JLabel("Your Items");
@@ -267,13 +244,14 @@ public class SellerGUI {
                 info.getFont().getStyle(),
                 30));
         myWelcomeScreen.add(info, BorderLayout.NORTH);
-         myWelcomeScreen.add(NO_ITEM_WELCOME, BorderLayout.CENTER);
-         NPViewItemsScreen(sortType);
+        NPViewItemsScreen(sortType);
 
     }
 
 
-
+    /**
+     * This method creates the JPanel that contains the add item form
+     */
     private void initializeAddItemForm()
     {
         myAddItemForm.setLayout(new BorderLayout());
@@ -352,6 +330,9 @@ public class SellerGUI {
         form.add(submitButton, c);
     }
 
+    /**
+     * This method creates the Jpanel that shows the edit item form.
+     */
     private void initializeEditItemForm()
     {
         myEditItemForm.setLayout(new BorderLayout());
@@ -433,6 +414,12 @@ public class SellerGUI {
         form.add(submitButton, c);
     }
 
+    /**
+     * Gets the items the seller has.
+     *
+     * @param sortType is how the seller wants their item to be sorted
+     * @return a boolean
+     */
     private boolean NPViewItemsScreen(String sortType) {
         ArrayList<Item> myItems;
         db.start();
@@ -472,40 +459,10 @@ public class SellerGUI {
         return (myItems.size() > 0);
     }
 
-    /**
-     * This method creates the Storefront Request JPanel.
-     * Puts the text area in BorderLayout.NORTH with the prompt,
-     * Puts the calendar in BorderLayout.CENTER
-     */
-    private void SellerStorefrontRequestScreen()
-    {
-        myRequestScreen.setLayout(new BorderLayout());
-
-        InitializeRequestScreen();
-        myRequestScreen.add(Storefront_REQUEST_HELP, BorderLayout.NORTH);
-        myRequestScreen.add(myRequestCalendarScreen, BorderLayout.CENTER);
-        myRequestScreen.setVisible(true);
-    }
 
     /**
-     * Basically the same as what you wrote,
-     * Instead of adding to myRequestScreen directly, it adds to a separate panel
-     * so that myRequestScreen can be formatted properly
+     * Logs the user out.
      */
-    private void InitializeRequestScreen()
-    {
-        GridLayout gLayout = new GridLayout(0, 7);
-        myRequestCalendarScreen.setLayout(gLayout);
-        Calendar cal = Calendar.getInstance();
-
-
-    }
-
-
-
-
-
-
     class LogOut implements ActionListener {
         @Override
         public void actionPerformed(ActionEvent e) {
@@ -516,9 +473,9 @@ public class SellerGUI {
     }
 
 
-
-
-
+    /**
+     * Enables the user to view items
+     */
     class ViewStorefront implements ActionListener
     {
 
@@ -532,6 +489,9 @@ public class SellerGUI {
 
     }
 
+    /**
+     * Starts the add item form.
+     */
     class AddItemForm implements ActionListener
     {
 
@@ -543,6 +503,9 @@ public class SellerGUI {
 
     }
 
+    /**
+     * Starts the edit item form.
+     */
     class EditItemForm implements ActionListener
     {
 
@@ -564,6 +527,9 @@ public class SellerGUI {
 
     }
 
+    /**
+     * Gets the sort type the user wants
+     */
     class sortItem implements ActionListener
     {
 
@@ -604,7 +570,9 @@ public class SellerGUI {
 
     }
 
-
+    /**
+     * This method class edits the item selected
+     */
     class EditItem implements ActionListener
     {
 
@@ -673,6 +641,9 @@ public class SellerGUI {
 
     }
 
+    /**
+     * This method class adds the item to the database.
+     */
     class SubmitItem implements ActionListener
     {
 
@@ -759,6 +730,9 @@ public class SellerGUI {
 
     }
 
+    /**
+     * This method removes item from database.
+     */
     class RemoveItem implements ActionListener
     {
 

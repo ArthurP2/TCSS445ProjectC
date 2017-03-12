@@ -22,6 +22,9 @@ public class DB {
     public DB(){
     }
 
+    /**
+     * Starts the database connection
+     */
     public void start(){
         Properties connectionProps = new Properties();
         connectionProps.put("user", userName);
@@ -34,6 +37,9 @@ public class DB {
         }
     }
 
+    /**
+     * Closes the database connection
+     */
     public void close(){
         try {
             conn.close();
@@ -43,7 +49,11 @@ public class DB {
     }
 
     /**
-     * Check password and username
+     * Checks password and username
+     *
+     * @param username is the username
+     * @param password is the password
+     * @return if its valid
      */
     public boolean checkCredentials(String username, String password){
         Statement stmt = null;
@@ -68,6 +78,12 @@ public class DB {
         return valid;
     }
 
+    /**
+     * Checks if username already exists
+     *
+     * @param enteredUsername is the username
+     * @return if it is valid to make new user.
+     */
     public boolean validate(String enteredUsername) {
         Statement stmt = null;
 
@@ -91,6 +107,12 @@ public class DB {
         return validLogin;
     }
 
+    /**
+     * Adds new user to database
+     *
+     * @param user is the user's parameters.
+     * @return if action was successful
+     */
     public boolean registerNewUser(User user) {
         Statement stmt = null;
         String query = "INSERT INTO apanlili.user (name, username, password, email, " +
@@ -110,6 +132,12 @@ public class DB {
         return noProblem;
     }
 
+    /**
+     * Gets the user's parameters from database.
+     *
+     * @param username is the user to get.
+     * @return the user's parameters.
+     */
     public User getUserinfo(String username){
         String query = "SELECT * FROM apanlili.user WHERE " +
                 "username='" + username + "';";
@@ -141,6 +169,12 @@ public class DB {
         return user;
     }
 
+    /**
+     * Adds item to the database
+     *
+     * @param item is the item to add
+     * @return if it has worked.
+     */
     public boolean addItem(Item item){
         String query = "INSERT INTO apanlili.item (sellerID, name, description, quantity, price, " +
                 "conditionType, size, comment) VALUES ('" + item.getSellerID() + "', '" + item.getName() + "', '" + item.getDescription() + "'" +
@@ -175,6 +209,12 @@ public class DB {
         return success;
     }
 
+    /**
+     * Gets a seller's items.
+     *
+     * @param sellerID is the seller.
+     * @return an arraylist of all items they own.
+     */
     public ArrayList<Item> getMyStoreItems(int sellerID){
         String query = "SELECT * FROM apanlili.item WHERE " +
                 "sellerID='" + sellerID + "';";
@@ -207,6 +247,13 @@ public class DB {
         return list;
     }
 
+    /**
+     * Gets all of a seller's items, but sorted in ascending order.
+     *
+     * @param sellerID the seller.
+     * @param sort the sort type.
+     * @return an arraylist of items.
+     */
     public ArrayList<Item> getMyStoreItemsSort(int sellerID, String sort){
         String query = "SELECT * FROM apanlili.item WHERE " +
                 "sellerID='" + sellerID + "' ORDER BY " + sort + ";";
@@ -273,7 +320,13 @@ public class DB {
     }
 
 
-
+    /**
+     * Removes item from database.
+     *
+     * @param itemID is the item to be removed.
+     * @param userID is the seller.
+     * @return if it was successful.
+     */
     public boolean removeItem(int itemID, int userID){
             String query = "SELECT * FROM apanlili.item WHERE itemID='" + itemID + "';";
             System.out.println("FINDITEM" + query);
@@ -295,6 +348,13 @@ public class DB {
         return noProblem;
     }
 
+    /**
+     * Checks if item exists.
+     *
+     * @param itemID is the item to be checked.
+     * @param userID if the user owns the item.
+     * @return if the item exists for that user.
+     */
     public boolean checkItemExists(int itemID, int userID) {
         String query = "SELECT * FROM apanlili.item WHERE (itemID='" + itemID + "' AND sellerID='" + userID + "');";
         System.out.println(query);
@@ -313,6 +373,15 @@ public class DB {
         return noProblem;
     }
 
+    /**
+     * Edits selected item.
+     *
+     * @param itemID the id of the item to be edited.
+     * @param sellerID the seller.
+     * @param theItem the item's new parameters.
+     * @param array checks if that parameter has been changed.
+     * @return if it was successful.
+     */
     public boolean editItem(int itemID, int sellerID, Item theItem, boolean array[]) {
         String query = "SELECT * FROM apanlili.item WHERE " +
                 "(itemID='" + itemID + "' AND sellerID='" + sellerID + "');";
