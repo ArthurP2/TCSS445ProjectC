@@ -43,10 +43,6 @@ public class GUI {
     final static String INPUTPANEL = "Login Page";
     final static String REGISPANEL = "Registration Page";
 
-    private static String serverName = "cssgate.insttech.washington.edu";
-    private static Connection conn;
-    private static String userName = "apanlili"; //Change to yours
-    private static String password = "kollunn~";
 
     private JFrame myFrame;
 
@@ -145,31 +141,8 @@ public class GUI {
 
         myFrame.add(containerPanel);
 
-        Properties connectionProps = new Properties();
-        connectionProps.put("user", userName);
-        connectionProps.put("password", password);
 
 
-        try {
-            conn = DriverManager.getConnection("jdbc:" + "mysql" + "://"
-                    + serverName + "/", connectionProps);
-            System.out.println("Connected to database");
-            Statement stmt = null;
-            String query = "SELECT id FROM apanlili.test";
-            stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            try {
-                while (rs.next()) {
-                    String coffeeName = rs.getString("id");
-                    System.out.println(coffeeName);
-                }
-            } catch (Exception e ) {
-
-            }
-
-        } catch (SQLException e){
-            System.out.print(e.toString());
-        }
 
         myFrame.setVisible(true);
     }
@@ -248,25 +221,10 @@ public class GUI {
                 String enteredUsername = usernameField.getText();
                 String enteredPassword = passwordField.getText();
 
-                Statement stmt = null;
+                db.start();
+                boolean validLogin = db.validate(enteredUsername);
+                db.close();
 
-                String query = "SELECT COUNT(*) FROM apanlili.user WHERE username='" + enteredUsername + "';";
-                boolean validLogin = false;
-                try {
-                    stmt = conn.createStatement();
-                    ResultSet rs = stmt.executeQuery(query);
-                    try {
-                        while (rs.next())
-                            if ((rs.getInt(1) > 0)) {
-                                validLogin = true;
-                        }
-
-                    } catch (Exception a) {
-                        System.out.println(a);
-                    }
-                } catch (SQLException b) {
-                    System.out.println(b);
-                }
 
 
                 if (!validLogin) {
@@ -276,11 +234,17 @@ public class GUI {
 
                 } else {
 
+                    boolean valid = false;
+
+                    db.start();
+                    valid = db.checkCredentials(enteredUsername,enteredPassword);
+                    db.close();
+
 					/*
 					 * If the user exists, but the password doesn't match then show
 					 * the incorrect password label, else send user to their specific GUI.
 					 */
-                    if (!checkCredentials(enteredUsername,enteredPassword)) {  ////////////////SQL LOGIN CHECK!!!!!!!!!!!!!!!!!
+                    if (!valid) {  ////////////////SQL LOGIN CHECK!!!!!!!!!!!!!!!!!
                         noUserFoundLabel.setText("The password entered is incorrect.");
                         noUserFoundLabel.setVisible(true);
                         myFrame.repaint();
@@ -295,7 +259,7 @@ public class GUI {
 
                         db.close();
                         if  (user.getIsBanned() == 1) {
-                            noUserFoundLabel.setText("YOU GOT BANNED!!HAHAHAH!!!!!!!!");
+                            noUserFoundLabel.setText("You have been banned");
                             noUserFoundLabel.setVisible(true);
                         } else {
                             if (user.getType()== 1) {
@@ -331,31 +295,7 @@ public class GUI {
     }
 
 
-    /**
-     * Check password and username
-     */
-    private boolean checkCredentials(String username, String password){
-        Statement stmt = null;
-        boolean valid = false;
-        String query = "SELECT COUNT(*) FROM apanlili.user WHERE " +
-                "(username='" + username + "' AND " + "password='" + password + "');";
-        System.out.println(query);
-        try {
-            stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(query);
-            try {
-                while (rs.next())
-                    if ((rs.getInt(1) > 0)) {
-                        valid = true;
-                    }
-            } catch (Exception a) {
-                System.out.println(a);
-            }
-        } catch (SQLException b) {
-            System.out.println(b);
-        }
-        return valid;
-    }
+
 
     /**
      * Creates the Registration panel that is added to the CardLayout.
@@ -497,21 +437,12 @@ public class GUI {
                         buttonGroup.getSelection().getActionCommand() != null) {
 
                     int type = Integer.valueOf(buttonGroup.getSelection().getActionCommand());
+                    User newUser = new User(0, nameField.getText(), regisUsernameField.getText(), regisPasswordField.getText(), emailField.getText(), phoneNumField.getText(), 0, type);
+                    db.start();
+                    boolean noProblem = db.registerNewUser(newUser);
+                    db.close();
 
-                    Statement stmt = null;
-                    String query = "INSERT INTO apanlili.user (name, username, password, email, " +
-                            "phoneNumber, isBanned, type) VALUES ('" + nameField.getText() + "" +
-                            "', '" + regisUsernameField.getText() + "', '" + regisPasswordField.getText() +
-                            "', '" + emailField.getText() + "', '" + phoneNumField.getText() +
-                            "', '" + "0" + "', '" + type + "');";
-                    int rowsUpdated = 0;
-                    try {
-                        stmt = conn.createStatement();
-                        rowsUpdated = stmt.executeUpdate(query);
-                    } catch (SQLException b) {
-                        System.out.println(b);
-                    }
-                    if (rowsUpdated > 0) {
+                    if (noProblem) {
                         cLayout.show(containerPanel, INPUTPANEL);
                     } else {
                         userAlreadyExists.setVisible(true);

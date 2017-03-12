@@ -1,9 +1,6 @@
 package com.TCSS445Project;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -13,9 +10,12 @@ import java.util.Properties;
  */
 public class DB {
 
+
+
+    //Change these for different database.
     private static String serverName = "cssgate.insttech.washington.edu";
     private static Connection conn;
-    private static String userName = "apanlili"; //Change to yours
+    private static String userName = "apanlili";
     private static String password = "kollunn~";
 
 
@@ -40,6 +40,74 @@ public class DB {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+
+    /**
+     * Check password and username
+     */
+    public boolean checkCredentials(String username, String password){
+        Statement stmt = null;
+        boolean valid = false;
+        String query = "SELECT COUNT(*) FROM apanlili.user WHERE " +
+                "(username='" + username + "' AND " + "password='" + password + "');";
+        System.out.println(query);
+        try {
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            try {
+                while (rs.next())
+                    if ((rs.getInt(1) > 0)) {
+                        valid = true;
+                    }
+            } catch (Exception a) {
+                System.out.println(a);
+            }
+        } catch (SQLException b) {
+            System.out.println(b);
+        }
+        return valid;
+    }
+
+    public boolean validate(String enteredUsername) {
+        Statement stmt = null;
+
+        String query = "SELECT COUNT(*) FROM apanlili.user WHERE username='" + enteredUsername + "';";
+        boolean validLogin = false;
+        try {
+            stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery(query);
+            try {
+                while (rs.next())
+                    if ((rs.getInt(1) > 0)) {
+                        validLogin = true;
+                    }
+
+            } catch (Exception a) {
+                System.out.println(a);
+            }
+        } catch (SQLException b) {
+            System.out.println(b);
+        }
+        return validLogin;
+    }
+
+    public boolean registerNewUser(User user) {
+        Statement stmt = null;
+        String query = "INSERT INTO apanlili.user (name, username, password, email, " +
+                "phoneNumber, isBanned, type) VALUES ('" + user.getName() + "" +
+                "', '" + user.getUsername() + "', '" + user.getPassword() +
+                "', '" + user.getEmail() + "', '" + user.getPhoneNumber() +
+                "', '" + "0" + "', '" + user.getType() + "');";
+        boolean noProblem = false;
+        int rowsUpdated = 0;
+        try {
+            stmt = conn.createStatement();
+            rowsUpdated = stmt.executeUpdate(query);
+            noProblem = true;
+        } catch (SQLException b) {
+            System.out.println(b);
+        }
+        return noProblem;
     }
 
     public User getUserinfo(String username){
